@@ -150,6 +150,59 @@ links.addEventListener("click", (e) => {
   }
 })();
 
+// Presentations password gate
+(function () {
+  const gate = document.getElementById("pwgate");
+  if (!gate) return;
+  const form = document.getElementById("pwgateForm");
+  const input = document.getElementById("pwgateInput");
+  const err = document.getElementById("pwgateErr");
+  const sub = document.getElementById("pwgateSub");
+  const HASH = "3f94986891646f845f29635c66294012c72affc7e7c9179fa818e5cfcbd20761";
+  const KEY = "pres-unlocked";
+  let target = null;
+
+  async function sha256(str) {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+    return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+  }
+
+  const open = (url, name) => {
+    target = url;
+    err.hidden = true;
+    input.value = "";
+    sub.textContent = name
+      ? "Enter the password to open “" + name + "”."
+      : "Enter the password to open this presentation.";
+    gate.hidden = false;
+    setTimeout(() => input.focus(), 50);
+  };
+  const close = () => { gate.hidden = true; };
+
+  document.querySelectorAll(".pres__open").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const url = btn.getAttribute("data-url");
+      if (sessionStorage.getItem(KEY) === "1") { window.location.href = url; return; }
+      open(url, btn.querySelector(".pres__title")?.textContent.trim());
+    });
+  });
+
+  gate.querySelectorAll("[data-close]").forEach((el) => el.addEventListener("click", close));
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !gate.hidden) close(); });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const ok = (await sha256(input.value)) === HASH;
+    if (ok) {
+      sessionStorage.setItem(KEY, "1");
+      if (target) window.location.href = target;
+    } else {
+      err.hidden = false;
+      input.select();
+    }
+  });
+})();
+
 // Research flip cards
 document.querySelectorAll(".flip").forEach((card) => {
   const toggle = () => {
