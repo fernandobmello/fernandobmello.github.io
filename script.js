@@ -67,23 +67,28 @@ links.addEventListener("click", (e) => {
   }
 
   async function run() {
-    await sleep(400);
-    for (const msg of script) {
-      if (msg.dir === "in") {
-        // incoming: show the typing indicator, then the message
-        if (status) status.textContent = "typing…";
-        const t = showTyping();
-        await sleep(750 + Math.min(msg.text.length * 16, 900));
-        t.remove();
-        if (status) status.textContent = "online";
-        addMessage(msg);
-        await sleep(450);
-      } else {
-        // outgoing (you): a short beat, then the reply
-        await sleep(550);
-        addMessage(msg);
-        await sleep(350);
+    // Loop the conversation forever: play it, wait 10s, clear, replay.
+    while (true) {
+      chat.querySelectorAll(".wa__msg, .wa__typing").forEach((el) => el.remove());
+      await sleep(400);
+      for (const msg of script) {
+        if (msg.dir === "in") {
+          // incoming: show the typing indicator, then the message
+          if (status) status.textContent = "typing…";
+          const t = showTyping();
+          await sleep(750 + Math.min(msg.text.length * 16, 900));
+          t.remove();
+          if (status) status.textContent = "online";
+          addMessage(msg);
+          await sleep(450);
+        } else {
+          // outgoing (you): a short beat, then the reply
+          await sleep(550);
+          addMessage(msg);
+          await sleep(350);
+        }
       }
+      await sleep(10000);
     }
   }
 
