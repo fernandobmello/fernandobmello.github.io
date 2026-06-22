@@ -739,7 +739,7 @@ img { max-width: 100%; display: block; }
   background: conic-gradient(var(--accent) calc(var(--tpct) * 1%), #e3ddd2 0);
   transition: --tpct 1.3s cubic-bezier(.2,.8,.2,1);
 }
-.tstat__ring.is-on { --tpct: 89; }
+.tstat__ring.is-on { --tpct: 94; }
 .tstat__ring::before {
   content: "";
   position: absolute;
