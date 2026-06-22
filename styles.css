@@ -83,6 +83,26 @@ img { max-width: 100%; display: block; }
 .nav__links a:hover { color: var(--accent); }
 .nav__links a:hover::after { width: 100%; }
 
+/* nav button (Presentations) */
+.nav__links a.nav__btn {
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  border-radius: 999px;
+  padding: 0.38rem 0.95rem;
+}
+.nav__links a.nav__btn::after { display: none; }
+.nav__links a.nav__btn:hover { background: var(--accent); color: #fff; }
+
+/* back link (separate pages) */
+.nav__back {
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+  transition: color .2s ease;
+}
+.nav__back:hover { color: var(--accent); }
+
 .nav__toggle {
   display: none;
   flex-direction: column;

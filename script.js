@@ -1,25 +1,30 @@
 // Footer year
-document.getElementById("year").textContent = new Date().getFullYear();
+const yearEl = document.getElementById("year");
+if (yearEl) yearEl.textContent = new Date().getFullYear();
 
 // Nav: shadow/border on scroll
 const nav = document.getElementById("nav");
-const onScroll = () => nav.classList.toggle("is-scrolled", window.scrollY > 8);
-onScroll();
-window.addEventListener("scroll", onScroll, { passive: true });
+if (nav) {
+  const onScroll = () => nav.classList.toggle("is-scrolled", window.scrollY > 8);
+  onScroll();
+  window.addEventListener("scroll", onScroll, { passive: true });
+}
 
 // Mobile menu toggle
-const toggle = document.querySelector(".nav__toggle");
-const links = document.getElementById("navLinks");
-toggle.addEventListener("click", () => {
-  const open = links.classList.toggle("is-open");
-  toggle.setAttribute("aria-expanded", open ? "true" : "false");
-});
-links.addEventListener("click", (e) => {
-  if (e.target.tagName === "A") {
-    links.classList.remove("is-open");
-    toggle.setAttribute("aria-expanded", "false");
-  }
-});
+const navToggle = document.querySelector(".nav__toggle");
+const navLinks = document.getElementById("navLinks");
+if (navToggle && navLinks) {
+  navToggle.addEventListener("click", () => {
+    const open = navLinks.classList.toggle("is-open");
+    navToggle.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+  navLinks.addEventListener("click", (e) => {
+    if (e.target.tagName === "A") {
+      navLinks.classList.remove("is-open");
+      navToggle.setAttribute("aria-expanded", "false");
+    }
+  });
+}
 
 // WhatsApp welcome chat animation
 (function () {
@@ -32,9 +37,9 @@ links.addEventListener("click", (e) => {
     { dir: "in", text: "Hi there 👋 Welcome to my site." },
     { dir: "in", text: "I'm Fernando B. Mello, a political scientist." },
     { dir: "out", text: "Hi! What do you study?" },
-    { dir: "in", text: "Political polarization — and how messaging apps like WhatsApp are reshaping politics." },
-    { dir: "in", text: "In Brazil and across the Global South, one forwarded message can move votes — and spread a lot of misinformation. 📲" },
-    { dir: "out", text: "Ha — fitting that you're telling me this over WhatsApp 😄" },
+    { dir: "in", text: "Political polarization, and how messaging apps like WhatsApp are reshaping politics." },
+    { dir: "in", text: "In Brazil and across the Global South, one forwarded message can move votes, and spread a lot of misinformation. 📲" },
+    { dir: "out", text: "Ha, fitting that you're telling me this over WhatsApp 😄" },
     { dir: "in", text: "Exactly. Scroll down and I'll show you my research 👇" },
   ];
 
