@@ -507,23 +507,12 @@ img { max-width: 100%; display: block; }
 }
 .edu__list { list-style: none; padding: 0; margin: 0; }
 .edu__list li {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  grid-template-areas: "deg yr" "school yr";
-  gap: 0 1rem;
   padding: 0.9rem 0;
   border-top: 1px solid var(--line);
 }
 .edu__list li:last-child { border-bottom: 1px solid var(--line); }
-.edu__deg { grid-area: deg; font-weight: 600; color: var(--ink); }
-.edu__school { grid-area: school; color: var(--ink-soft); font-size: 0.95rem; }
-.edu__yr {
-  grid-area: yr;
-  align-self: center;
-  font-family: var(--serif);
-  font-weight: 600;
-  color: var(--accent);
-}
+.edu__deg { display: block; font-weight: 600; color: var(--ink); }
+.edu__school { display: block; color: var(--ink-soft); font-size: 0.95rem; }
 
 .awards__title {
   font-family: var(--serif);
