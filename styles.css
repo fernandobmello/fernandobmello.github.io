@@ -681,7 +681,7 @@ img { max-width: 100%; display: block; }
 /* ---------- Teaching ---------- */
 .teach {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 2rem;
 }
 .teach__col h3 {
@@ -696,6 +696,91 @@ img { max-width: 100%; display: block; }
 .teach__col ul { list-style: none; padding: 0; margin: 0; }
 .teach__col li { padding: 0.4rem 0; color: var(--ink-soft); font-size: 0.96rem; }
 .teach__col li em { color: var(--muted); font-style: normal; font-size: 0.85rem; }
+
+/* teaching stats */
+.teach-stats {
+  margin-top: 2.4rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.4rem;
+}
+.tstat {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 1.9rem 1.4rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-height: 200px;
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.tstat:hover { transform: translateY(-4px); box-shadow: 0 24px 48px -30px rgba(60,40,20,.4); }
+.tstat__num {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: clamp(2.4rem, 5vw, 3.2rem);
+  line-height: 1;
+  color: var(--accent);
+  letter-spacing: -0.02em;
+}
+.tstat__num--sm { font-size: clamp(1.25rem, 2.6vw, 1.55rem); color: var(--ink); }
+.tstat__label {
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  max-width: 22ch;
+}
+
+/* circular evaluation gauge */
+@property --tpct {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+.tstat__ring {
+  --tpct: 0;
+  position: relative;
+  width: 112px; height: 112px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: conic-gradient(var(--accent) calc(var(--tpct) * 1%), #e3ddd2 0);
+  transition: --tpct 1.3s cubic-bezier(.2,.8,.2,1);
+}
+.tstat__ring.is-on { --tpct: 89; }
+.tstat__ring::before {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border-radius: 50%;
+  background: var(--bg);
+}
+.tstat__ringval {
+  position: relative;
+  z-index: 1;
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1.7rem;
+  color: var(--ink);
+}
+.tstat__ringval small { font-size: 0.85rem; color: var(--muted); font-weight: 500; }
+
+/* award medal */
+.tstat__badge {
+  display: grid;
+  place-items: center;
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: rgba(156, 66, 33, 0.08);
+  color: var(--accent);
+}
+
+@media (max-width: 680px) {
+  .teach-stats { grid-template-columns: 1fr; }
+}
 
 /* ---------- Contact ---------- */
 .section--contact {

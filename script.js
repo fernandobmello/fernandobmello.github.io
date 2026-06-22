@@ -104,6 +104,52 @@ links.addEventListener("click", (e) => {
   }
 })();
 
+// Teaching stats: count-up + gauge fill when scrolled into view
+(function () {
+  const stats = document.querySelector(".teach-stats");
+  if (!stats) return;
+  const counters = stats.querySelectorAll("[data-count]");
+  const ring = stats.querySelector(".tstat__ring");
+
+  function animateCount(el) {
+    const target = parseInt(el.getAttribute("data-count"), 10) || 0;
+    const dur = 1300;
+    const start = performance.now();
+    (function step(now) {
+      const p = Math.min((now - start) / dur, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(target * eased);
+      if (p < 1) requestAnimationFrame(step);
+    })(start);
+  }
+
+  let done = false;
+  const go = () => {
+    if (done) return;
+    done = true;
+    counters.forEach(animateCount);
+    if (ring) requestAnimationFrame(() => ring.classList.add("is-on"));
+  };
+
+  const inView = () => {
+    const r = stats.getBoundingClientRect();
+    return r.top < window.innerHeight * 0.85 && r.bottom > 0;
+  };
+  const check = () => { if (inView()) { go(); window.removeEventListener("scroll", check); } };
+
+  if (inView()) {
+    go();
+  } else {
+    window.addEventListener("scroll", check, { passive: true });
+    if ("IntersectionObserver" in window) {
+      const io = new IntersectionObserver((entries) => {
+        if (entries.some((e) => e.isIntersecting)) { go(); io.disconnect(); }
+      }, { threshold: 0.4 });
+      io.observe(stats);
+    }
+  }
+})();
+
 // Reveal on scroll
 const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const items = document.querySelectorAll(".reveal");
