@@ -42,6 +42,7 @@ links.addEventListener("click", (e) => {
   const stamp =
     String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0");
 
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const scrollDown = () => { chat.scrollTop = chat.scrollHeight; };
 
   function addMessage(msg) {
@@ -56,10 +57,53 @@ links.addEventListener("click", (e) => {
     scrollDown();
   }
 
-  // Render the whole conversation at once.
-  script.forEach(addMessage);
-  if (status) status.textContent = "online";
-  scrollDown();
+  function showTyping() {
+    const t = document.createElement("div");
+    t.className = "wa__typing";
+    t.innerHTML = "<span></span><span></span><span></span>";
+    chat.appendChild(t);
+    scrollDown();
+    return t;
+  }
+
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  async function run() {
+    if (reduce) {
+      script.forEach(addMessage);
+      if (status) status.textContent = "online";
+      return;
+    }
+    await sleep(400);
+    for (const msg of script) {
+      if (msg.dir === "in") {
+        // incoming: show the typing indicator, then the message
+        if (status) status.textContent = "typing…";
+        const t = showTyping();
+        await sleep(750 + Math.min(msg.text.length * 16, 900));
+        t.remove();
+        if (status) status.textContent = "online";
+        addMessage(msg);
+        await sleep(450);
+      } else {
+        // outgoing (you): a short beat, then the reply
+        await sleep(550);
+        addMessage(msg);
+        await sleep(350);
+      }
+    }
+  }
+
+  // The chat is the first thing on the page, so just start it shortly after load.
+  let started = false;
+  const begin = () => { if (started) return; started = true; run(); };
+  if (document.readyState === "complete") {
+    begin();
+  } else {
+    window.addEventListener("load", begin, { once: true });
+    // safety net in case the load event was already missed
+    setTimeout(begin, 1200);
+  }
 })();
 
 // Reveal on scroll
