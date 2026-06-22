@@ -66,14 +66,7 @@ links.addEventListener("click", (e) => {
     return t;
   }
 
-  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
   async function run() {
-    if (reduce) {
-      script.forEach(addMessage);
-      if (status) status.textContent = "online";
-      return;
-    }
     await sleep(400);
     for (const msg of script) {
       if (msg.dir === "in") {
