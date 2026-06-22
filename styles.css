@@ -594,6 +594,72 @@ img { max-width: 100%; display: block; }
 }
 .card__body { color: var(--ink-soft); font-size: 0.96rem; margin: 0; }
 
+/* flip cards */
+.cards__hint {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin: 0 0 1.5rem;
+}
+.flip {
+  perspective: 1500px;
+  min-height: 300px;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.flip:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 16px; }
+.flip__inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  transition: transform .6s cubic-bezier(.2,.75,.2,1);
+  transform-style: preserve-3d;
+}
+.flip.is-flipped .flip__inner { transform: rotateY(180deg); }
+.flip__face {
+  position: absolute;
+  inset: 0;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 1.6rem;
+  overflow: hidden;
+  transition: box-shadow .25s ease, border-color .25s ease;
+}
+.flip:hover .flip__face { box-shadow: 0 24px 48px -30px rgba(60,40,20,.4); border-color: #d8cdbb; }
+.flip__back {
+  transform: rotateY(180deg);
+  background: linear-gradient(160deg, #fffdf9, #f1e9dd);
+}
+.flip__face .card__body { font-size: 0.92rem; }
+.flip__hint {
+  margin-top: auto;
+  padding-top: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--accent);
+}
+.flip__paper {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1.06rem;
+  line-height: 1.28;
+  margin: 0 0 0.55rem;
+  color: var(--ink);
+}
+.flip__authors { margin: 0; font-size: 0.88rem; color: var(--muted); }
+.flip__venue { margin: 0.3rem 0 0; font-size: 0.92rem; color: var(--ink-soft); }
+@media (max-width: 680px) {
+  .flip { min-height: 360px; }
+}
+
 /* ---------- Publications ---------- */
 .pubs__note { font-size: 0.85rem; color: var(--muted); margin: 0 0 1.5rem; }
 .pubs__cat {

@@ -150,6 +150,21 @@ links.addEventListener("click", (e) => {
   }
 })();
 
+// Research flip cards
+document.querySelectorAll(".flip").forEach((card) => {
+  const toggle = () => {
+    const flipped = card.classList.toggle("is-flipped");
+    card.setAttribute("aria-pressed", flipped ? "true" : "false");
+  };
+  card.addEventListener("click", toggle);
+  card.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      toggle();
+    }
+  });
+});
+
 // Reveal on scroll
 const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const items = document.querySelectorAll(".reveal");
