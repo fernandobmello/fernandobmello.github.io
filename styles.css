@@ -563,7 +563,11 @@ img { max-width: 100%; display: block; }
   padding: 0.45rem 1rem;
   font-size: 0.88rem;
   color: var(--ink-soft);
+  transition: border-color .2s ease, color .2s ease;
 }
+.awards li a { color: inherit; text-decoration: none; }
+.awards li a span { color: var(--accent); font-size: 0.82em; margin-left: 1px; }
+.awards li:has(a):hover { border-color: var(--accent); color: var(--accent); }
 
 /* ---------- Research ---------- */
 .feature {
