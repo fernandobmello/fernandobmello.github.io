@@ -208,6 +208,18 @@ if (navToggle && navLinks) {
   });
 })();
 
+// Student comments reveal (Teaching)
+document.querySelectorAll(".comments__toggle").forEach((btn) => {
+  const panel = document.getElementById(btn.getAttribute("aria-controls"));
+  const label = btn.querySelector(".comments__label");
+  btn.addEventListener("click", () => {
+    const willOpen = panel.hasAttribute("hidden");
+    panel.hidden = !willOpen;
+    btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
+    if (label) label.textContent = willOpen ? "Hide students' comments" : "See selected students' comments";
+  });
+});
+
 // Research flip cards
 document.querySelectorAll(".flip").forEach((card) => {
   const toggle = () => {
