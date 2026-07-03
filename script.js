@@ -212,11 +212,18 @@ if (navToggle && navLinks) {
 document.querySelectorAll(".comments__toggle").forEach((btn) => {
   const panel = document.getElementById(btn.getAttribute("aria-controls"));
   const label = btn.querySelector(".comments__label");
+  const quotes = panel ? panel.querySelectorAll(".quote") : [];
   btn.addEventListener("click", () => {
     const willOpen = panel.hasAttribute("hidden");
-    panel.hidden = !willOpen;
     btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
     if (label) label.textContent = willOpen ? "Hide students' comments" : "See selected students' comments";
+    if (willOpen) {
+      panel.hidden = false;
+      quotes.forEach((q, i) => setTimeout(() => q.classList.add("in"), 120 + i * 180));
+    } else {
+      panel.hidden = true;
+      quotes.forEach((q) => q.classList.remove("in"));
+    }
   });
 });
 

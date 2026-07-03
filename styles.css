@@ -922,7 +922,11 @@ img { max-width: 100%; display: block; }
   border: 1px solid var(--line);
   border-radius: 14px;
   padding: 1.35rem 1.4rem 1.2rem;
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity .5s ease, transform .5s ease;
 }
+.quote.in { opacity: 1; transform: none; }
 .quote blockquote {
   margin: 0 0 0.85rem;
   font-size: 0.9rem;
