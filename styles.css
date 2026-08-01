@@ -1097,7 +1097,7 @@ img { max-width: 100%; display: block; }
 /* ---------- Presentations ---------- */
 .pres__note { color: var(--ink-soft); margin: 0 0 1.7rem; max-width: 60ch; }
 .pres-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.9rem; }
-.pres__open {
+.pres__open, .pres__link {
   width: 100%;
   display: flex;
   align-items: center;
@@ -1111,10 +1111,11 @@ img { max-width: 100%; display: block; }
   cursor: pointer;
   font: inherit;
   color: inherit;
+  text-decoration: none;
   transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
 }
-.pres__open:hover { transform: translateY(-3px); box-shadow: 0 22px 44px -30px rgba(60,40,20,.4); border-color: #d8cdbb; }
-.pres__open:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.pres__open:hover, .pres__link:hover { transform: translateY(-3px); box-shadow: 0 22px 44px -30px rgba(60,40,20,.4); border-color: #d8cdbb; }
+.pres__open:focus-visible, .pres__link:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .pres__info { display: flex; flex-direction: column; gap: 3px; }
 .pres__title { font-family: var(--serif); font-weight: 600; font-size: 1.2rem; }
 .pres__meta { font-size: 0.85rem; color: var(--muted); }
