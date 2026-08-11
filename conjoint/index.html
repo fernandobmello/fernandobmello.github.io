@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="pt-BR" translate="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google" content="notranslate">
+<meta name="robots" content="noindex, nofollow">
+<title>Pesquisa — Eleições 2026</title>
+<style>
+  :root {
+    --primary: #1a56db;
+    --primary-dark: #1e40af;
+    --accent: #0ea5e9;
+    --success: #10b981;
+    --bg: #f0f4f8;
+    --card: #ffffff;
+    --text: #1e293b;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --radius: 12px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.08);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 40px;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* ── HEADER ── */
+  .survey-header {
+    background: linear-gradient(135deg, var(--primary) 0%, #1d4ed8 100%);
+    color: #fff;
+    padding: 18px 20px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(26,86,219,0.3);
+  }
+  .survey-header h1 { font-size: 0.95rem; font-weight: 600; opacity: 0.92; }
+  .survey-header .section-label { font-size: 0.72rem; opacity: 0.7; margin-top: 2px; }
+  .progress-bar-wrap { margin-top: 10px; }
+  .progress-bar-track { height: 4px; background: rgba(255,255,255,0.25); border-radius: 2px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: #7dd3fc; border-radius: 2px; transition: width 0.4s ease; width: 0%; }
+  .progress-label { font-size: 0.68rem; opacity: 0.7; text-align: right; margin: 4px 0 8px; }
+
+  /* ── CONTAINER / SCREEN / CARD ── */
+  .container { max-width: 760px; margin: 0 auto; padding: 22px 14px; }
+  .screen { display: none; }
+  .screen.active { display: block; animation: fadeIn 0.28s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 26px 24px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 520px) { .card { padding: 20px 16px; } }
+
+  /* ── QUESTION ── */
+  .question-block { margin-bottom: 28px; }
+  .question-block:last-of-type { margin-bottom: 0; }
+  .followup { border-left: 3px solid #bfdbfe; padding-left: 15px; margin-top: -10px; }
+  .question-text { font-size: 1rem; font-weight: 600; line-height: 1.5; margin-bottom: 10px; }
+  .question-subtext { font-size: 0.82rem; color: var(--muted); margin-bottom: 14px; line-height: 1.45; }
+
+  /* ── OPTIONS ── */
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .opt {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 15px; border: 2px solid var(--border); border-radius: 10px;
+    cursor: pointer; transition: all 0.15s; background: #fff;
+  }
+  .opt:hover { border-color: var(--accent); background: #f0f9ff; }
+  .opt input[type="radio"], .opt input[type="checkbox"] {
+    margin-top: 2px; accent-color: var(--primary); width: 18px; height: 18px; flex-shrink: 0;
+  }
+  .opt.selected { border-color: var(--primary); background: #eff6ff; }
+  .opt span { font-size: 0.93rem; line-height: 1.4; flex: 1; }
+  .opt.selected span { font-weight: 600; color: var(--primary-dark); }
+
+  /* ── SCALE ── */
+  .scale-wrap { margin-top: 6px; }
+  .scale-labels { display: flex; justify-content: space-between; margin-bottom: 6px; gap: 8px; }
+  .scale-labels span { font-size: 0.68rem; color: var(--muted); line-height: 1.25; }
+  .scale-labels span:last-child { text-align: right; }
+  .scale-buttons { display: flex; gap: 6px; }
+  .scale-btn {
+    flex: 1; aspect-ratio: 1; border: 2px solid var(--border); border-radius: 9px;
+    background: #fff; cursor: pointer; font-size: 0.9rem; font-weight: 700; color: var(--muted);
+    transition: all 0.15s; display: flex; align-items: center; justify-content: center;
+  }
+  .scale-btn:hover { border-color: var(--accent); color: var(--primary); }
+  .scale-btn.selected { border-color: var(--primary); background: var(--primary); color: #fff; }
+
+  /* ── THERMOMETER SLIDER ── */
+  .thermo { margin-bottom: 22px; }
+  .thermo:last-child { margin-bottom: 0; }
+  .thermo-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+  .thermo-name { font-size: 0.95rem; font-weight: 600; }
+  .thermo-val { font-size: 1.05rem; font-weight: 700; color: var(--primary); font-variant-numeric: tabular-nums; }
+  .thermo-val.untouched { color: var(--muted); font-weight: 500; font-size: 0.82rem; }
+  input[type="range"] {
+    width: 100%; height: 30px; appearance: none; background: transparent; cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 8px; border-radius: 4px; background: linear-gradient(90deg,#94a3b8,#cbd5e1,#60a5fa);
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    appearance: none; width: 26px; height: 26px; border-radius: 50%; background: #fff;
+    border: 3px solid var(--primary); margin-top: -9px; box-shadow: 0 2px 6px rgba(0,0,0,.2);
+  }
+  input[type="range"]::-moz-range-track { height: 8px; border-radius: 4px; background: linear-gradient(90deg,#94a3b8,#cbd5e1,#60a5fa); }
+  input[type="range"]::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background:#fff; border: 3px solid var(--primary); }
+  .thermo-ends { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+
+  /* ── INPUTS ── */
+  select, input[type="text"], input[type="number"] {
+    width: 100%; padding: 12px 15px; border: 2px solid var(--border); border-radius: 10px;
+    font-size: 0.93rem; color: var(--text); background: #fff; font-family: inherit;
+  }
+  select { appearance: none; cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 14px center; padding-right: 38px; }
+  select:focus, input:focus { outline: none; border-color: var(--primary); }
+
+  /* ── WHATSAPP MOCK GROUP ── */
+  .phone { width: min(330px, 92%); margin: 0 auto 20px; background:#0b141a; border-radius: 34px; padding: 10px;
+           box-shadow: 0 24px 50px -22px rgba(20,30,25,.55); }
+  .wa { border-radius: 26px; overflow: hidden; display: flex; flex-direction: column; background: #efe7de; }
+  .wa__bar { display: flex; align-items: center; gap: 9px; background: #008069; color: #fff; padding: 14px 12px 10px; }
+  .wa__back { font-size: 1.4rem; line-height: 1; opacity: .9; }
+  .wa__avatar { width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,.28);
+                display:flex; align-items:center; justify-content:center; font-size:1.05rem; flex:none; }
+  .wa__id { display: flex; flex-direction: column; line-height: 1.2; margin-right: auto; min-width: 0; }
+  .wa__name { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .wa__status { font-size: 0.68rem; opacity: .85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .wa__chat {
+    padding: 12px 10px 14px; display: flex; flex-direction: column; gap: 7px;
+    background-color: #efe7de; background-image: radial-gradient(rgba(0,0,0,.04) 1px, transparent 1px);
+    background-size: 16px 16px;
+  }
+  .wa__day { align-self: center; background:#fff; color:#54656f; font-size:0.62rem; font-weight:600;
+             letter-spacing:.04em; padding:3px 10px; border-radius:8px; box-shadow:0 1px 1px rgba(0,0,0,.08); margin-bottom:3px; }
+  .wa__msg { position: relative; max-width: 84%; padding: 5px 9px 6px; font-size: 0.84rem; line-height: 1.35;
+             color: #111b21; border-radius: 9px; box-shadow: 0 1px 1px rgba(0,0,0,.12); word-wrap: break-word;
+             opacity: 0; transform: translateY(9px) scale(.96);
+             transition: opacity .3s ease, transform .3s cubic-bezier(.2,.8,.2,1); }
+  .wa__msg.show { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { .wa__msg { transition: opacity .15s linear; transform: none; } }
+  .wa__msg--in { align-self: flex-start; background: #fff; border-top-left-radius: 2px; }
+  .wa__msg--out { align-self: flex-end; background: #d9fdd3; border-top-right-radius: 2px; }
+  .wa__sender { display: block; font-size: 0.72rem; font-weight: 700; margin-bottom: 1px; }
+  .wa__t { float: right; font-size: 0.6rem; color: #667781; margin: 5px 0 -2px 8px; }
+  .wa__input { display:flex; align-items:center; gap:8px; background:#efe7de; padding: 8px 10px 10px; }
+  .wa__input .box { flex:1; background:#fff; border-radius:20px; padding:8px 14px; font-size:0.8rem; color:#8696a0; }
+  .wa__input .mic { width:34px; height:34px; border-radius:50%; background:#008069; color:#fff;
+                    display:flex; align-items:center; justify-content:center; font-size:0.95rem; flex:none; }
+
+  /* ── INSTRUCTION BOX ── */
+  .instruction-box {
+    background: linear-gradient(135deg,#eff6ff,#e0f2fe);
+    border-left: 4px solid var(--primary);
+    border-radius: 10px; padding: 15px 17px; margin-bottom: 18px;
+    font-size: 0.93rem; line-height: 1.55;
+  }
+  .instruction-box strong { display: block; margin-bottom: 4px; }
+
+  /* ── CONJOINT PAIR ── */
+  .task-counter { display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 14px; }
+  .task-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--border); }
+  .task-dot.active { background: var(--primary); }
+  .task-dot.done { background: var(--success); }
+  /* colunas de largura idêntica; minmax(0,·) impede que uma imagem estoure a coluna */
+  .conjoint-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+                   gap: 14px; margin-bottom: 16px; align-items: start; }
+  @media (max-width: 620px) { .conjoint-pair { grid-template-columns: minmax(0, 1fr); } }
+  .conjoint-card {
+    border: 3px solid var(--border); border-radius: var(--radius); overflow: hidden;
+    cursor: pointer; transition: all 0.18s; background: #fff; position: relative;
+  }
+  .conjoint-card:hover { border-color: var(--accent); }
+  .conjoint-card.selected { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(26,86,219,0.15); }
+  /* ── MOLDURA DE WHATSAPP DAS TAREFAS ──
+     A imagem é só o card de notícia; o grupo (nome + mensagens) é desenhado aqui,
+     então muda conforme o bloco. Altura fixa: os dois lados de um par ocupam
+     exatamente a mesma caixa, independentemente do tamanho do card. */
+  .wa--task { height: 600px; }
+  .wa--task .wa__bar { padding: 10px 10px; }
+  .wa--task .wa__avatar { width: 30px; height: 30px; font-size: 0.9rem; }
+  .wa--task .wa__name { font-size: 0.82rem; }
+  .wa--task .wa__status { font-size: 0.62rem; }
+  .wa--task .wa__chat { flex: 1; justify-content: flex-end; gap: 6px;
+                        padding: 10px 9px; overflow: hidden; }
+  .wa--task .wa__msg { opacity: 1; transform: none; transition: none;
+                       font-size: 0.72rem; max-width: 82%; }
+  .wa--task .wa__sender { font-size: 0.62rem; }
+  .wa--task .wa__input { padding: 7px 9px 9px; }
+  .wa--task .wa__input .box { font-size: 0.68rem; padding: 6px 12px; }
+  .wa--task .wa__input .mic { width: 28px; height: 28px; font-size: 0.8rem; }
+  .wa__cardwrap { align-self: flex-start; max-width: 86%; max-height: 100%;
+                  display: flex; flex-direction: column; gap: 5px; min-height: 0; }
+  .wa__card { display: block; width: 100%; height: auto; max-height: 100%;
+              object-fit: contain; object-position: left top;
+              border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,.16); }
+
+  /* ── VARIANTES "POST" (fonte = post e post_source) ──
+     Não são card de notícia: são uma mensagem de texto encaminhada, com a foto
+     dentro do balão e os contadores em pílulas embaixo. */
+  .post-bubble { background:#fff; border-radius:9px; border-top-left-radius:2px;
+                 box-shadow:0 1px 1px rgba(0,0,0,.12); padding:8px 9px 9px;
+                 display:flex; flex-direction:column; gap:7px; min-height:0; }
+  .post-head { display:flex; align-items:center; gap:7px; }
+  .post-head .flag { width:26px; height:26px; border-radius:50%; background:#e8f0ea;
+                     display:flex; align-items:center; justify-content:center; font-size:.85rem; flex:none; }
+  .post-head .who { display:flex; flex-direction:column; line-height:1.15; margin-right:auto; min-width:0; }
+  .post-head .name { font-size:.7rem; font-weight:700; color:#111b21; }
+  .post-head .kind { font-size:.6rem; color:#667781; }
+  .post-head .dots { color:#667781; font-size:.8rem; }
+  .post-txt { font-size:.72rem; line-height:1.35; color:#111b21; }
+  .post-cta { font-size:.68rem; line-height:1.35; color:#111b21; }
+  .post-photo { display:block; width:100%; height:auto; border-radius:4px; min-height:0; object-fit:cover; }
+  .post-pills { display:flex; gap:8px; }
+  .post-pills span { background:#fff; border-radius:20px; padding:3px 9px; font-size:.65rem;
+                     color:#111b21; box-shadow:0 1px 1px rgba(0,0,0,.12); white-space:nowrap; }
+  .conjoint-card .choice-label {
+    position: relative; padding: 12px 44px; text-align: center; font-size: 0.85rem;
+    font-weight: 600; color: var(--muted); background: #f8fafc; border-top: 1px solid var(--border);
+  }
+  .conjoint-card.selected .choice-label { color: #fff; background: var(--primary); }
+  .zoom-btn {
+    position: absolute; top: 50%; right: 6px; transform: translateY(-50%); z-index: 3;
+    width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border);
+    background: #fff; font-size: 0.95rem; cursor: pointer; line-height: 1;
+  }
+  .conjoint-card.selected .zoom-btn { border-color: rgba(255,255,255,.5); }
+  .zoom-hint { font-size: 0.75rem; color: var(--muted); text-align: center; margin-bottom: 10px; }
+
+  /* ── LIGHTBOX ── */
+  #lightbox { position: fixed; inset: 0; background: rgba(0,0,0,.9); z-index: 3000;
+              display: none; align-items: center; justify-content: center; padding: 12px; }
+  #lightbox.show { display: flex; }
+  #lightbox-content { width: min(94vw, 620px); max-height: 92vh; overflow-y: auto; }
+  /* o clone perde os limites da moldura: aqui ele ocupa a largura toda da lupa */
+  #lightbox-content .wa__cardwrap { max-width: 100%; max-height: none; }
+  #lightbox-content .wa__card { max-height: none; }
+  #lightbox-content .post-txt { font-size: 1rem; }
+  #lightbox-content .post-cta { font-size: .95rem; }
+  #lightbox-content .post-head .name { font-size: .95rem; }
+  #lightbox-content .post-head .kind { font-size: .8rem; }
+  #lightbox-content .post-head .flag { width: 34px; height: 34px; font-size: 1.1rem; }
+  #lightbox-content .post-pills span { font-size: .85rem; padding: 5px 12px; }
+  #lightbox .close { position: absolute; top: 14px; right: 18px; color: #fff; font-size: 2rem;
+                     background: none; border: none; cursor: pointer; line-height: 1; }
+
+  /* ── ALERT ── */
+  .alert {
+    display: none; background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c;
+    border-radius: 9px; padding: 11px 14px; font-size: 0.85rem; margin-top: 14px;
+  }
+  .alert.show { display: block; }
+
+  /* ── NAV BUTTONS ── */
+  .nav-buttons { display: flex; gap: 10px; margin-top: 22px; justify-content: flex-end; }
+  .btn { padding: 12px 26px; border-radius: 10px; border: none; font-size: 0.93rem;
+         font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-secondary { background: transparent; color: var(--muted); border: 2px solid var(--border); }
+  .btn-secondary:hover { border-color: var(--muted); color: var(--text); }
+  .btn:disabled, .btn:disabled:hover {
+    background: #cbd5e1; color: #64748b; cursor: not-allowed; transform: none;
+  }
+  .btn-lg { padding: 15px 34px; font-size: 1.02rem; }
+
+  /* ── CONSENT ── */
+  .tcle-header { display:flex; align-items:center; gap:12px; border-bottom:2px solid var(--border);
+                 padding-bottom:14px; margin-bottom:16px; }
+  .tcle-icon { width:44px; height:44px; border-radius:10px; background:linear-gradient(135deg,#eff6ff,#dbeafe);
+               display:flex; align-items:center; justify-content:center; font-size:1.35rem; flex-shrink:0; }
+  .tcle-title { font-size:1.05rem; font-weight:700; line-height:1.3; }
+  .tcle-subtitle { font-size:0.78rem; color:var(--muted); margin-top:2px; }
+  .tcle-body p { font-size:0.92rem; line-height:1.65; color:#374151; margin-bottom:11px; }
+  .info-pill { display:inline-flex; align-items:center; gap:6px; background:#eff6ff; border:1px solid #bfdbfe;
+               border-radius:20px; padding:6px 13px; font-size:0.8rem; color:var(--primary-dark); margin:3px 4px 3px 0; }
+  .consent-inline { background:#f8fafc; border:1px solid var(--border); border-radius:10px; padding:18px 20px; margin:18px 0 4px; }
+
+  /* ── BLOCK INTRO ── */
+  .block-badge { display:inline-block; background:var(--primary); color:#fff; font-size:0.64rem; font-weight:700;
+                 letter-spacing:0.08em; text-transform:uppercase; padding:4px 11px; border-radius:20px; margin-bottom:12px; }
+  .block-title { font-size:1.15rem; font-weight:700; line-height:1.4; margin-bottom:12px; }
+  .block-lead { font-size:0.95rem; line-height:1.6; color:#374151; margin-bottom:18px; }
+
+  /* ── THANKS ── */
+  .thanks-icon { font-size: 3.4rem; margin-bottom: 14px; }
+  .thanks-title { font-size: 1.6rem; font-weight: 700; color: var(--success); margin-bottom: 12px; }
+  .status-msg { font-size:0.9rem; color:var(--muted); margin-top:14px; }
+  .debrief { margin-top:22px; padding:18px 20px; background:#eff6ff; border:1px solid #bfdbfe;
+             border-radius:10px; text-align:left; color:#1e3a5f; }
+  .debrief-title { font-weight:700; margin-bottom:10px; font-size:0.95rem; }
+  .debrief p { font-size:0.88rem; line-height:1.6; margin-bottom:10px; }
+  .debrief p:last-child { margin-bottom:0; }
+</style>
+</head>
+<body>
+
+<div class="survey-header">
+  <h1>Pesquisa — Eleições 2026</h1>
+  <div class="section-label" id="section-label">Seção 1 de 5</div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progress-fill"></div></div>
+    <div class="progress-label" id="progress-label">0 de 17</div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ══════════ SCREEN 0 — CONSENTIMENTO ══════════ -->
+  <div class="screen active" id="screen-0">
+    <div class="card">
+      <div class="tcle-header">
+        <div class="tcle-icon">📱</div>
+        <div>
+          <div class="tcle-title">Pesquisa sobre conteúdos que viralizam no WhatsApp</div>
+          <div class="tcle-subtitle">Universidade Carlos III de Madrid</div>
+        </div>
+      </div>
+      <div class="tcle-body">
+        <p>Olá! Estamos realizando uma pesquisa sobre conteúdos que podem viralizar no WhatsApp durante as eleições. No passado, você manifestou interesse em colaborar com campanhas, e gostaríamos de conhecer melhor como ocorre o compartilhamento de conteúdos, em parceria com pesquisadores da Universidade Carlos III de Madrid.</p>
+        <p>A pesquisa leva no máximo 5 minutos. Nosso objetivo é entrevistar 2.000 pessoas e, entre os participantes, sortearemos um <strong>iPhone 17</strong>, o modelo mais recente.</p>
+        <p>Não existem respostas certas ou erradas. Estamos interessados apenas em suas opiniões sinceras.</p>
+        <p>Suas respostas serão mantidas em sigilo e analisadas apenas de forma agregada, nunca individualmente.</p>
+      </div>
+      <div style="margin:14px 0 4px;">
+        <span class="info-pill">⏱️ 5 minutos</span>
+        <span class="info-pill">🔒 Respostas sigilosas</span>
+        <span class="info-pill">🎁 Sorteio de um iPhone 17</span>
+      </div>
+
+      <div class="consent-inline">
+        <div class="question-text">Você concorda em participar desta pesquisa?</div>
+        <div class="options" id="q-consent">
+          <label class="opt"><input type="radio" name="consent" value="1"><span>Sim, concordo em participar da pesquisa</span></label>
+          <label class="opt"><input type="radio" name="consent" value="0"><span>Não, não concordo em participar da pesquisa</span></label>
+        </div>
+      </div>
+      <div class="alert" id="alert-consent">Por favor, selecione uma opção para continuar.</div>
+      <div class="nav-buttons">
+        <button class="btn btn-primary btn-lg" onclick="startSurvey()">Começar →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SCREEN 1 — INTERESSE / INFLUÊNCIA / COMPARTILHAMENTO ══════════ -->
+  <div class="screen" id="screen-1">
+    <div class="card">
+      <div class="question-block">
+        <div class="question-text">Qual é o seu nível de interesse por política?</div>
+        <div class="options" id="q-interesse">
+          <label class="opt"><input type="radio" name="interesse" value="1"><span>Nenhum interesse</span></label>
+          <label class="opt"><input type="radio" name="interesse" value="2"><span>Pouco interesse</span></label>
+          <label class="opt"><input type="radio" name="interesse" value="3"><span>Muito interesse</span></label>
+        </div>
+      </div>
+
+      <div class="question-block">
+        <div class="question-text">Quão importante você considera tentar influenciar a opinião de outras pessoas durante as eleições?</div>
+        <div class="scale-wrap">
+          <div class="scale-labels"><span>0 — Nada importante</span><span>7 — Extremamente importante</span></div>
+          <div class="scale-buttons" id="scale-influencia">
+            <button type="button" class="scale-btn" onclick="setScale('influencia',0,this)">0</button>
+            <button type="button" class="scale-btn" onclick="setScale('influencia',1,this)">1</button>
+            <button type="button" class="scale-btn" onclick="setScale('influencia',2,this)">2</button>
+            <button type="button" class="scale-btn" onclick="setScale('influencia',3,this)">3</button>
+            <button type="button" class="scale-btn" onclick="setScale('influencia',4,this)">4</button>
+            <button type="button" class="scale-btn" onclick="setScale('influencia',5,this)">5</button>
+            <button type="button" class="scale-btn" onclick="setScale('influencia',6,this)">6</button>
+            <button type="button" class="scale-btn" onclick="setScale('influencia',7,this)">7</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="question-block">
+        <div class="question-text">Em uma semana típica, com que frequência você compartilha conteúdo político no WhatsApp?</div>
+        <div class="options" id="q-compartilha">
+          <label class="opt"><input type="radio" name="compartilha" value="1"><span>Nunca</span></label>
+          <label class="opt"><input type="radio" name="compartilha" value="2"><span>Às vezes</span></label>
+          <label class="opt"><input type="radio" name="compartilha" value="3"><span>Frequentemente</span></label>
+          <label class="opt"><input type="radio" name="compartilha" value="4"><span>Sempre</span></label>
+        </div>
+      </div>
+
+      <div class="alert" id="alert-s1">Por favor, responda todas as perguntas desta página.</div>
+      <div class="nav-buttons">
+        <button class="btn btn-primary" onclick="validateScreen1()">Próximo →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SCREEN 2 — PARTIDOS / TERMÔMETROS ══════════ -->
+  <div class="screen" id="screen-2">
+    <div class="card">
+      <div class="question-block">
+        <div class="question-text">Você acredita que existe algum partido político que representa a sua forma de pensar?</div>
+        <div class="options" id="q-partido_sim">
+          <label class="opt"><input type="radio" name="partido_sim" value="1"><span>Sim</span></label>
+          <label class="opt"><input type="radio" name="partido_sim" value="0"><span>Não</span></label>
+        </div>
+      </div>
+
+      <div class="question-block followup" id="block-partido_gosta" style="display:none;">
+        <div class="question-text">Qual partido você <strong>MAIS</strong> gosta?</div>
+        <div class="options" id="q-partido_gosta"></div>
+      </div>
+
+      <div class="question-block">
+        <div class="question-text">Existe algum partido político de que você não gosta?</div>
+        <div class="options" id="q-partido_nao">
+          <label class="opt"><input type="radio" name="partido_nao" value="1"><span>Sim</span></label>
+          <label class="opt"><input type="radio" name="partido_nao" value="0"><span>Não</span></label>
+        </div>
+      </div>
+
+      <div class="question-block followup" id="block-partido_menos" style="display:none;">
+        <div class="question-text">Qual partido você <strong>MENOS</strong> gosta?</div>
+        <div class="options" id="q-partido_menos"></div>
+      </div>
+
+      <div class="question-block">
+        <div class="question-text">Em uma escala de 0 a 100, em que valores mais baixos indicam sentimentos mais negativos e valores mais altos indicam sentimentos mais positivos, onde você colocaria os seguintes grupos?</div>
+        <div class="question-subtext">Arraste cada barra para escolher um valor.</div>
+
+        <div class="thermo">
+          <div class="thermo-head">
+            <span class="thermo-name">Petistas</span>
+            <span class="thermo-val untouched" id="val-termo_petistas">— arraste —</span>
+          </div>
+          <input type="range" min="0" max="100" value="50" id="termo_petistas" oninput="onThermo('termo_petistas')">
+          <div class="thermo-ends"><span>0 — Muito negativo</span><span>100 — Muito positivo</span></div>
+        </div>
+
+        <div class="thermo">
+          <div class="thermo-head">
+            <span class="thermo-name">Brasileiros antipetistas</span>
+            <span class="thermo-val untouched" id="val-termo_antipetistas">— arraste —</span>
+          </div>
+          <input type="range" min="0" max="100" value="50" id="termo_antipetistas" oninput="onThermo('termo_antipetistas')">
+          <div class="thermo-ends"><span>0 — Muito negativo</span><span>100 — Muito positivo</span></div>
+        </div>
+      </div>
+
+      <div class="question-block">
+        <div class="question-text">Você diria que é mais bolsonarista ou mais antipetista?</div>
+        <div class="options" id="q-bolso_anti">
+          <label class="opt"><input type="radio" name="bolso_anti" value="bolsonarista"><span>Sou mais bolsonarista do que antipetista</span></label>
+          <label class="opt"><input type="radio" name="bolso_anti" value="antipetista"><span>Sou mais antipetista do que bolsonarista</span></label>
+          <label class="opt"><input type="radio" name="bolso_anti" value="ambos"><span>Sou igualmente bolsonarista e antipetista</span></label>
+          <label class="opt"><input type="radio" name="bolso_anti" value="nenhum"><span>Não sou nem bolsonarista nem antipetista</span></label>
+        </div>
+      </div>
+
+      <div class="alert" id="alert-s2">Por favor, responda todas as perguntas desta página (inclusive as duas barras de 0 a 100).</div>
+      <div class="nav-buttons">
+        <button class="btn btn-secondary" onclick="goTo(1)">← Voltar</button>
+        <button class="btn btn-primary" onclick="validateScreen2()">Próximo →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SCREENS 3–14 — CONJOINTS (gerados dinamicamente) ══════════ -->
+
+  <!-- ══════════ SCREEN 15 — DEMOGRAFIA 1 ══════════ -->
+  <div class="screen" id="screen-15">
+    <div class="card">
+      <div class="question-block">
+        <div class="question-text">Qual é o seu gênero?</div>
+        <div class="options" id="q-genero">
+          <label class="opt"><input type="radio" name="genero" value="homem"><span>Homem</span></label>
+          <label class="opt"><input type="radio" name="genero" value="mulher"><span>Mulher</span></label>
+        </div>
+      </div>
+
+      <div class="question-block">
+        <div class="question-text">Qual é a sua idade?</div>
+        <input type="number" id="idade" min="16" max="110" inputmode="numeric" placeholder="Digite sua idade em anos">
+      </div>
+
+      <div class="question-block">
+        <div class="question-text">Qual é o nível mais alto de escolaridade que você completou?</div>
+        <div class="options" id="q-escolaridade">
+          <label class="opt"><input type="radio" name="escolaridade" value="fund_incompleto"><span>Ensino fundamental incompleto</span></label>
+          <label class="opt"><input type="radio" name="escolaridade" value="medio_completo"><span>Ensino médio completo</span></label>
+          <label class="opt"><input type="radio" name="escolaridade" value="superior_completo"><span>Ensino superior completo</span></label>
+          <label class="opt"><input type="radio" name="escolaridade" value="pos"><span>Pós-graduação</span></label>
+        </div>
+      </div>
+
+      <div class="question-block">
+        <div class="question-text">Qual é a renda mensal da sua família?</div>
+        <div class="options" id="q-renda">
+          <label class="opt"><input type="radio" name="renda" value="ate_2000"><span>R$ 0 – R$ 2.000</span></label>
+          <label class="opt"><input type="radio" name="renda" value="2001_3000"><span>R$ 2.001 – R$ 3.000</span></label>
+          <label class="opt"><input type="radio" name="renda" value="3001_5000"><span>R$ 3.001 – R$ 5.000</span></label>
+          <label class="opt"><input type="radio" name="renda" value="5001_10000"><span>R$ 5.001 – R$ 10.000</span></label>
+          <label class="opt"><input type="radio" name="renda" value="acima_10000"><span>Acima de R$ 10.000</span></label>
+        </div>
+      </div>
+
+      <div class="alert" id="alert-s15">Por favor, responda todas as perguntas desta página.</div>
+      <div class="nav-buttons">
+        <button class="btn btn-primary" onclick="validateScreen15()">Próximo →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SCREEN 16 — DEMOGRAFIA 2 ══════════ -->
+  <div class="screen" id="screen-16">
+    <div class="card">
+      <div class="question-block">
+        <div class="question-text">Qual é a sua cor ou raça?</div>
+        <div class="options" id="q-raca">
+          <label class="opt"><input type="radio" name="raca" value="branca"><span>Branca</span></label>
+          <label class="opt"><input type="radio" name="raca" value="preta"><span>Preta</span></label>
+          <label class="opt"><input type="radio" name="raca" value="parda"><span>Parda</span></label>
+          <label class="opt"><input type="radio" name="raca" value="amarela"><span>Amarela</span></label>
+          <label class="opt"><input type="radio" name="raca" value="indigena"><span>Indígena</span></label>
+        </div>
+      </div>
+
+      <div class="question-block">
+        <div class="question-text">Qual é o estado onde você mora?</div>
+        <select id="estado">
+          <option value="">— Selecione seu estado —</option>
+        </select>
+      </div>
+
+      <div class="question-block">
+        <div class="question-text">Com que frequência você participa de missas, cultos ou outras atividades religiosas?</div>
+        <div class="options" id="q-religiao">
+          <label class="opt"><input type="radio" name="religiao" value="nunca"><span>Nunca</span></label>
+          <label class="opt"><input type="radio" name="religiao" value="raramente"><span>Raramente</span></label>
+          <label class="opt"><input type="radio" name="religiao" value="algumas_vezes_ano"><span>Algumas vezes por ano</span></label>
+          <label class="opt"><input type="radio" name="religiao" value="1_2_mes"><span>Uma ou duas vezes por mês</span></label>
+          <label class="opt"><input type="radio" name="religiao" value="1_semana"><span>Uma vez por semana</span></label>
+          <label class="opt"><input type="radio" name="religiao" value="mais_1_semana"><span>Mais de uma vez por semana</span></label>
+        </div>
+      </div>
+
+      <div class="question-block">
+        <div class="question-text">Ao longo dos últimos 25 anos, alguns grupos ganharam importância na sociedade, enquanto outros perderam importância. Pensando nos últimos 25 anos, você diria que você e pessoas como você:</div>
+        <div class="options" id="q-status">
+          <label class="opt"><input type="radio" name="status" value="ganharam_muita"><span>Ganharam muita importância na sociedade</span></label>
+          <label class="opt"><input type="radio" name="status" value="ganharam_alguma"><span>Ganharam alguma importância na sociedade</span></label>
+          <label class="opt"><input type="radio" name="status" value="nem_nem"><span>Nem ganharam nem perderam importância na sociedade</span></label>
+          <label class="opt"><input type="radio" name="status" value="perderam_alguma"><span>Perderam alguma importância na sociedade</span></label>
+          <label class="opt"><input type="radio" name="status" value="perderam_muita"><span>Perderam muita importância na sociedade</span></label>
+        </div>
+      </div>
+
+      <div class="alert" id="alert-s16">Por favor, responda todas as perguntas desta página.</div>
+      <div class="nav-buttons">
+        <button class="btn btn-secondary" onclick="goTo(15)">← Voltar</button>
+        <button class="btn btn-primary btn-lg" onclick="finishSurvey()">Enviar respostas →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SCREEN 17 — AGRADECIMENTO ══════════ -->
+  <div class="screen" id="screen-17">
+    <div class="card" style="text-align:center;">
+      <div class="thanks-icon">🎉</div>
+      <div class="thanks-title">Obrigado pela sua participação.</div>
+      <p style="font-size:0.95rem; line-height:1.65; color:#374151;">
+        O sorteio do iPhone será realizado dentro de algumas semanas, e comunicaremos o resultado
+        por e-mail às pessoas que concluíram o estudo.
+      </p>
+
+      <div class="debrief">
+        <div class="debrief-title">Esclarecimento importante</div>
+        <p>
+          Obrigado por participar no nosso estudo. Agora que respondeu às nossas perguntas,
+          gostaríamos de esclarecer alguns pontos importantes sobre os materiais que viu.
+          Algumas das mensagens que você viu reproduziam conteúdos <strong>falsos</strong> que
+          circulam na internet, e foram criadas apenas para esta pesquisa. Por favor, ignore
+          esse conteúdo e não o compartilhe: essas mensagens contêm informação falsa.
+        </p>
+        <p>
+          Os grupos de WhatsApp mostrados na pesquisa também são fictícios, e as manchetes
+          não representam a posição dos pesquisadores nem dos veículos cujas marcas aparecem
+          nas imagens.
+        </p>
+        <p>
+          Em algumas semanas enviaremos, por e-mail, um material indicando quais mensagens
+          eram falsas e quais eram verdadeiras.
+        </p>
+      </div>
+
+      <div class="status-msg" id="submit-status">Enviando suas respostas…</div>
+      <div class="alert" id="submit-error" style="text-align:left;">
+        <strong>Não foi possível enviar suas respostas.</strong>
+        Verifique sua conexão com a internet e toque no botão abaixo para tentar novamente.
+        <div style="margin-top:10px;">
+          <button class="btn btn-primary" style="font-size:0.85rem; padding:9px 18px;" onclick="submitResponses()">Tentar enviar novamente</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SCREEN 99 — SEM CONSENTIMENTO ══════════ -->
+  <div class="screen" id="screen-99">
+    <div class="card" style="text-align:center;">
+      <div class="thanks-icon">👋</div>
+      <div class="thanks-title" style="color:var(--muted);">Obrigado pelo seu tempo.</div>
+      <p style="font-size:0.95rem; line-height:1.65; color:#374151;">
+        Você optou por não participar da pesquisa. Você já pode fechar esta página.
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<div id="lightbox" onclick="closeLightbox()">
+  <button class="close" onclick="closeLightbox()" aria-label="Fechar">×</button>
+  <div id="lightbox-content"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+//  CONFIGURAÇÃO
+// ═══════════════════════════════════════════════════════════════════
+
+// >>> COLE AQUI a URL do Web App do Google Apps Script (ver apps-script.gs)
+const ENDPOINT = 'COLE_AQUI_A_URL_DO_APPS_SCRIPT';
+
+const SURVEY_VERSION = 'conjoint_v1';
+const TASKS_PER_BLOCK = 5;
+
+// ── ATRIBUTOS DO CONJOINT ────────────────────────────────────────────
+// Notícias: f1–f6 = falsas, t1–t6 = verdadeiras.
+// `valence` define a ORDEM das duas mensagens no bloco A (ver CTX_A abaixo):
+//   'pro_bolsonaro' → conteúdo favorável a Flávio
+//   'anti_pt'       → conteúdo desfavorável a Lula / ao PT
+//   'unclear'       → não é claramente nem um nem outro; a ordem sai no sorteio
+// Classificação feita a partir da manchete — confira antes de ir a campo.
+const STORIES = [
+  { key:'f1', veracity:'false', valence:'unclear',       headline:'Hacker vaza documento mostrando que urna eletrônica pode ser fraudada' },
+  { key:'f2', veracity:'false', valence:'unclear',       headline:'Em 2026, TSE venceu prêmio internacional sobre combate a desinformação' },
+  { key:'f3', veracity:'false', valence:'anti_pt',       headline:'Filho de Lula comprou a companhia aérea Azul' },
+  { key:'f4', veracity:'false', valence:'pro_bolsonaro', headline:'PF concluiu não haver crime em mensagens entre Flávio Bolsonaro e Vorcaro' },
+  { key:'f5', veracity:'false', valence:'anti_pt',       headline:'Lula criticou Neymar após derrota do Brasil na Copa' },
+  { key:'f6', veracity:'false', valence:'pro_bolsonaro', headline:'Levantamento mostra Flávio com 68% de intenção de voto' },
+  { key:'t1', veracity:'true',  valence:'pro_bolsonaro', headline:'Com elogios a brasileiro, Trump publica foto com Flávio Bolsonaro' },
+  { key:'t2', veracity:'true',  valence:'anti_pt',       headline:'Mendonça autoriza PF a investigar suposto tráfico de influência de Lulinha' },
+  { key:'t3', veracity:'true',  valence:'anti_pt',       headline:'Lula e Alcolumbre se encontram na casa de Moraes após rompimento' },
+  { key:'t4', veracity:'true',  valence:'unclear',       headline:'Flávio pede desculpas a Michelle e faz convite para "caminharem juntos"' },
+  { key:'t5', veracity:'true',  valence:'unclear',       headline:'TSE divulga divisão do Fundo Eleitoral; PL e PT receberão maiores fatias' },
+  { key:'t6', veracity:'true',  valence:'unclear',       headline:'Vereador propõe ceder terreno público para ONG da mãe, e Câmara aprova' }
+];
+
+// Níveis do atributo FONTE — 4 níveis, todos disponíveis para as 12 notícias.
+//   g1          card jornalístico com a marca G1
+//   no_source   mesmo card jornalístico, sem marca
+//   post        mensagem encaminhada, sem fonte nenhuma
+//   post_source mensagem encaminhada assinada por uma página desconhecida
+// Os dois primeiros são imagens recortadas dos prints originais; os dois últimos
+// são desenhados em CSS a partir da manchete + foto da notícia.
+const SOURCES  = ['g1', 'no_source', 'post', 'post_source'];
+const VIRALITY = ['high', 'low'];
+const RENDERED_SOURCES = new Set(['post', 'post_source']);
+
+// Página fictícia usada no nível post_source
+const FAKE_PAGE = { name: 'Brasil Notícias', kind: 'Página de notícias' };
+
+// Chamada padrão das mensagens encaminhadas — é o texto que já aparecia nos
+// posts originais (f3, f4, f5), aplicado agora às 12 notícias.
+const POST_CTA = ['Por que não falam sobre isso?', 'Compartilhe antes que apaguem'];
+
+// Contadores das variantes desenhadas. Iguais nos dois níveis de fonte
+// desenhados, para que fonte e viralização não fiquem confundidas.
+const COUNTS = {
+  high: { react: '21,3 mil', fwd: '28,7 mil' },
+  low:  { react: '21',       fwd: '9' }
+};
+
+// Se true, as 5 tarefas de um bloco usam 10 notícias distintas (sem repetição
+// dentro do bloco). Se false, cada perfil é sorteado de forma independente com
+// reposição (garantindo apenas que os dois perfis de um mesmo par sejam distintos).
+const NO_REPEAT_WITHIN_BLOCK = true;
+
+const ASSET_DIR = 'assets/';
+function imgFor(story, source, virality) { return ASSET_DIR + story + '_' + source + '_' + virality + '.jpg'; }
+function photoFor(story) { return ASSET_DIR + 'photo_' + story + '.jpg'; }
+
+// ── BLOCOS ───────────────────────────────────────────────────────────
+// Remetentes usados nas mensagens de contexto das tarefas.
+const SENDERS = [
+  { sender:'Marcos R.',  color:'#e542a3' }, { sender:'Cláudia S.', color:'#1f7aec' },
+  { sender:'Rogério M.', color:'#c4820e' }, { sender:'Aline P.',   color:'#6a3fd0' },
+  { sender:'Débora L.',  color:'#0a8a6f' }, { sender:'Paulo M.',   color:'#b5432c' }
+];
+const CTX_COUNT = 3;        // mensagens de contexto acima do card (bloco B)
+
+// ── Bloco A: duas mensagens fixas, ordem definida pela valência do card ──
+// A mensagem que "responde" ao card vem por último, colada nele:
+//   card pró-Flávio  → Fora Lula e PT!  /  Flávio Bolsonaro, Presidente!
+//   card anti-PT     → Flávio Bolsonaro, Presidente!  /  Fora Lula e PT!
+//   card indefinido  → ordem sorteada
+const MSG_FLAVIO = 'Flávio Bolsonaro, Presidente!';
+const MSG_FORA   = 'Fora Lula e PT!';
+const CTX_A_ORDER = {
+  pro_bolsonaro: [MSG_FORA, MSG_FLAVIO],
+  anti_pt:       [MSG_FLAVIO, MSG_FORA]
+};
+
+const BLOCKS = {
+  A: {
+    key: 'A',
+    groupName: 'Flávio 2026 / Fora PT',
+    groupSub: 'Grupo · 248 participantes',
+    lead: 'Imagine que você participa de um grupo de WhatsApp sobre política chamado <strong>Flávio 2026 / Fora PT</strong>, formado apenas por eleitores de Flávio Bolsonaro e críticos ao PT. Veja um exemplo de trocas no grupo:',
+    // conversa fixa da tela de introdução: estabelece quem está no grupo
+    messages: [
+      { sender:'Marcos R.',  color:'#e542a3', text:'Vamos, Flávio Bolsonaro',  t:'14:02' },
+      { sender:'Cláudia S.', color:'#1f7aec', text:'Fora Lula',                t:'14:03' },
+      { sender:'Rogério M.', color:'#c4820e', text:'Fora PT',                  t:'14:03' },
+      { sender:'Aline P.',   color:'#6a3fd0', text:'Bolsonaro 2026',           t:'14:05' }
+    ],
+    // O bloco A usa sempre as mesmas duas mensagens; o que muda é a ORDEM,
+    // definida pela valência do card (ver contextFor()). Sem pool sorteado.
+    fixedPair: true
+  },
+  B: {
+    key: 'B',
+    groupName: 'Política 2026',
+    groupSub: 'Grupo · 311 participantes',
+    lead: 'Imagine que você participa de um grupo de WhatsApp sobre política chamado <strong>Política 2026</strong>, formado por eleitores de Lula, Flávio Bolsonaro, de outros candidatos, além de eleitores indecisos. Veja um exemplo de trocas no grupo:',
+    messages: [
+      { sender:'Marcos R.',  color:'#e542a3', text:'Aqui é Flávio Bolsonaro',                     t:'14:02' },
+      { sender:'Cláudia S.', color:'#1f7aec', text:'Aqui é Lula',                                 t:'14:02' },
+      { sender:'Rogério M.', color:'#c4820e', text:'Eu ainda não me decidi. Quem pode me ajudar?', t:'14:04' },
+      { sender:'Aline P.',   color:'#6a3fd0', text:'Também preciso de mais informação',            t:'14:05' },
+      { sender:'Débora L.',  color:'#0a8a6f', text:'Idem aqui',                                    t:'14:06' }
+    ],
+    pool: [
+      'Olá, pessoal', 'Boa tarde', 'Bom dia', 'Boa noite',
+      'Como estão todos?', 'Oi, tudo bem?', 'E aí, gente', 'Bom dia a todos'
+    ]
+  }
+};
+
+const TASK_PROMPT = 'Quais das duas mensagens abaixo você prefere compartilhar no grupo?';
+const TASK_PROMPT_SUB = 'Escolha uma obrigatoriamente.';
+
+// ── LAYOUT DE TELAS ──────────────────────────────────────────────────
+// 0 consentimento · 1–2 pré-tratamento · 3–14 conjoints (gerados) · 15–16 demografia · 17 fim
+const CONJ_ANCHOR   = 15;   // as telas geradas são inseridas ANTES desta
+const CONJ_START    = 3;
+const TOTAL_SCREENS = 18;
+const NO_CONSENT_SCREEN = 99;
+
+// Partidos: a ordem é sorteada por respondente. "Outro" fica sempre por último.
+const PARTIES = ['MDB','PSDB','NOVO','Republicanos','União Brasil','PDT','PL','PSOL','PT','PSB','PSD'];
+const PARTY_LAST = 'Outro';
+const PARTY_ORDER = {};   // { partido_gosta: [...], partido_menos: [...] }
+
+const UFS = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR',
+             'PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
+const UF_NAMES = {AC:'Acre',AL:'Alagoas',AP:'Amapá',AM:'Amazonas',BA:'Bahia',CE:'Ceará',
+  DF:'Distrito Federal',ES:'Espírito Santo',GO:'Goiás',MA:'Maranhão',MT:'Mato Grosso',
+  MS:'Mato Grosso do Sul',MG:'Minas Gerais',PA:'Pará',PB:'Paraíba',PR:'Paraná',PE:'Pernambuco',
+  PI:'Piauí',RJ:'Rio de Janeiro',RN:'Rio Grande do Norte',RS:'Rio Grande do Sul',RO:'Rondônia',
+  RR:'Roraima',SC:'Santa Catarina',SP:'São Paulo',SE:'Sergipe',TO:'Tocantins'};
+
+// ═══════════════════════════════════════════════════════════════════
+//  ESTADO
+// ═══════════════════════════════════════════════════════════════════
+let currentScreen = 0;
+const responses = {};
+let BLOCK_ORDER = null;   // ex.: ['B','A']
+let BLOCK_CONTEXT = null; // mensagens acima do card, por bloco
+let TASKS = null;         // 10 tarefas, na ordem em que são exibidas
+let screenEnterTs = null;
+let submitted = false;
+
+function uuid() {
+  if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random()*16|0, v = c === 'x' ? r : (r&0x3|0x8);
+    return v.toString(16);
+  });
+}
+const RESPONDENT_ID = uuid();
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length-1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; }
+  return a;
+}
+function pick(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+
+// ═══════════════════════════════════════════════════════════════════
+//  RANDOMIZAÇÃO DO CONJOINT
+// ═══════════════════════════════════════════════════════════════════
+function buildProfile(story) {
+  const source = pick(SOURCES);
+  const virality = pick(VIRALITY);
+  const rendered = RENDERED_SOURCES.has(source);
+  return {
+    story: story.key,
+    veracity: story.veracity,
+    valence: story.valence,
+    headline: story.headline,
+    source: source,
+    virality: virality,
+    rendered: rendered,
+    profile_id: story.key + '_' + source + '_' + virality,
+    // fontes em imagem usam o card recortado; as desenhadas usam só a foto
+    img: rendered ? null : imgFor(story.key, source, virality),
+    photo: photoFor(story.key)
+  };
+}
+
+function buildBlockTasks(blockKey) {
+  const tasks = [];
+  let pool = [];
+  if (NO_REPEAT_WITHIN_BLOCK) pool = shuffle(STORIES);   // 12 notícias, usamos 10
+
+  for (let i = 0; i < TASKS_PER_BLOCK; i++) {
+    let sL, sR;
+    if (NO_REPEAT_WITHIN_BLOCK) {
+      sL = pool[i*2]; sR = pool[i*2 + 1];
+    } else {
+      sL = pick(STORIES);
+      do { sR = pick(STORIES); } while (sR.key === sL.key);
+    }
+    // A ordem esquerda/direita já é aleatória porque o pool foi embaralhado
+    // e os dois sorteios são independentes; embaralhamos mesmo assim.
+    const pair = shuffle([buildProfile(sL), buildProfile(sR)]);
+    // Resolve o contexto AGORA e guarda no perfil: para notícias 'unclear' a
+    // ordem é sorteada, então ela precisa ser fixada uma única vez — senão o
+    // que é gravado no fim não seria o que o respondente viu.
+    pair.forEach(p => { p.ctx = contextFor(blockKey, p); });
+    tasks.push({ block: blockKey, task_in_block: i+1, left: pair[0], right: pair[1], choice: null, rt_ms: null });
+  }
+  return tasks;
+}
+
+// Mensagens de contexto: sorteadas UMA VEZ por bloco e repetidas nas 5 tarefas
+// daquele bloco, para o pano de fundo ficar constante enquanto o card varia.
+function buildBlockContext(blockKey) {
+  const block = BLOCKS[blockKey];
+  const people = shuffle(SENDERS);
+  // Bloco A: as duas mensagens são fixas. Sorteamos só QUEM diz cada uma —
+  // uma vez por respondente — para que a ordem seja o único elemento que muda
+  // entre um card e outro.
+  if (block.fixedPair) {
+    return {
+      fixedPair: true,
+      speaker: { [MSG_FLAVIO]: people[0], [MSG_FORA]: people[1] }
+    };
+  }
+  const texts = shuffle(block.pool).slice(0, CTX_COUNT);
+  return {
+    msgs: texts.map((text, i) => ({
+      text, sender: people[i].sender, color: people[i].color,
+      // a última é do próprio respondente (balão verde), como num grupo real
+      out: i === CTX_COUNT - 1
+    }))
+  };
+}
+
+// Mensagens que aparecem acima de UM card específico.
+// No bloco A a ordem depende da valência do card, então cada lado do par pode
+// ter uma ordem diferente. No bloco B o contexto é o mesmo do bloco inteiro.
+function contextFor(blockKey, profile) {
+  const ctx = BLOCK_CONTEXT[blockKey];
+  if (!ctx.fixedPair) return ctx.msgs;
+  const order = CTX_A_ORDER[profile.valence] || shuffle([MSG_FLAVIO, MSG_FORA]);
+  return order.map(text => ({
+    text, sender: ctx.speaker[text].sender, color: ctx.speaker[text].color, out: false
+  }));
+}
+
+function buildAllTasks() {
+  BLOCK_ORDER = shuffle(['A','B']);
+  BLOCK_CONTEXT = { A: buildBlockContext('A'), B: buildBlockContext('B') };
+  TASKS = [];
+  BLOCK_ORDER.forEach(bk => { buildBlockTasks(bk).forEach(t => TASKS.push(t)); });
+  TASKS.forEach((t, i) => { t.task_global = i+1; });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  GERAÇÃO DAS TELAS DO CONJOINT
+// ═══════════════════════════════════════════════════════════════════
+function chatHTML(block, screenNum) {
+  const msgs = block.messages.map(m => `
+    <div class="wa__msg wa__msg--in">
+      <span class="wa__sender" style="color:${m.color}">${m.sender}</span>
+      ${m.text}<span class="wa__t">${m.t}</span>
+    </div>`).join('');
+  return `
+    <div class="phone">
+      <div class="wa">
+        <div class="wa__bar">
+          <span class="wa__back" aria-hidden="true">&#8249;</span>
+          <div class="wa__avatar" aria-hidden="true">👥</div>
+          <div class="wa__id">
+            <span class="wa__name">${block.groupName}</span>
+            <span class="wa__status">${block.groupSub}</span>
+          </div>
+        </div>
+        <div class="wa__chat" id="chat-${screenNum}">
+          <div class="wa__day">HOJE</div>
+          ${msgs}
+        </div>
+        <div class="wa__input">
+          <div class="box">Mensagem</div>
+          <div class="mic" aria-hidden="true">🎤</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// O conteúdo compartilhado: card de notícia (imagem) ou mensagem encaminhada
+// (desenhada em CSS), conforme o nível de fonte do perfil.
+function cardHTML(p, alt) {
+  if (!p.rendered) {
+    return `<div class="wa__cardwrap">
+      <img class="wa__card" src="${p.img}" alt="${alt}" loading="lazy">
+    </div>`;
+  }
+  const c = COUNTS[p.virality];
+  const head = p.source === 'post_source' ? `
+      <div class="post-head">
+        <div class="flag" aria-hidden="true">🇧🇷</div>
+        <div class="who"><span class="name">${FAKE_PAGE.name}</span>
+          <span class="kind">${FAKE_PAGE.kind}</span></div>
+        <span class="dots" aria-hidden="true">•••</span>
+      </div>` : '';
+  return `<div class="wa__cardwrap" role="img" aria-label="${alt}">
+      <div class="post-bubble">
+        ${head}
+        <div class="post-txt">${p.headline}</div>
+        <div class="post-cta">${POST_CTA[0]}<br>${POST_CTA[1]}</div>
+        <img class="post-photo" src="${p.photo}" alt="" loading="lazy">
+      </div>
+      <div class="post-pills">
+        <span>👍😮🙏 ${c.react}</span><span>↗ ${c.fwd}</span>
+      </div>
+    </div>`;
+}
+
+// Moldura de uma opção da tarefa: cabeçalho do grupo + contexto do bloco + card.
+function taskFrameHTML(block, ctx, profile, alt) {
+  const bubbles = ctx.map(m => m.out
+    ? `<div class="wa__msg wa__msg--out">${m.text}</div>`
+    : `<div class="wa__msg wa__msg--in"><span class="wa__sender" style="color:${m.color}">${m.sender}</span>${m.text}</div>`
+  ).join('');
+  return `
+    <div class="wa wa--task">
+      <div class="wa__bar">
+        <span class="wa__back" aria-hidden="true">&#8249;</span>
+        <div class="wa__avatar" aria-hidden="true">👥</div>
+        <div class="wa__id">
+          <span class="wa__name">${block.groupName}</span>
+          <span class="wa__status">${block.groupSub}</span>
+        </div>
+      </div>
+      <div class="wa__chat">
+        ${bubbles}
+        ${cardHTML(profile, alt)}
+      </div>
+      <div class="wa__input">
+        <div class="box">Mensagem</div>
+        <div class="mic" aria-hidden="true">🎤</div>
+      </div>
+    </div>`;
+}
+
+const INTRO_SCREENS = new Set();
+
+function generateConjointScreens() {
+  const container = document.querySelector('.container');
+  const anchor = document.getElementById('screen-' + CONJ_ANCHOR);
+  let n = CONJ_START;
+
+  BLOCK_ORDER.forEach((bk, bi) => {
+    const block = BLOCKS[bk];
+
+    // ── tela de introdução do bloco ──
+    const intro = document.createElement('div');
+    intro.className = 'screen';
+    intro.id = 'screen-' + n;
+    const introNum = n;
+    intro.innerHTML = `
+      <div class="card">
+        <div class="block-badge">Parte ${bi+1} de 2</div>
+        <div class="block-lead">${block.lead}</div>
+        ${chatHTML(block, introNum)}
+        <div class="instruction-box" style="margin-top:20px;">
+          <strong>A seguir você verá ${TASKS_PER_BLOCK} pares de mensagens.</strong>
+          Em cada par, escolha a mensagem que você prefere compartilhar nesse grupo.
+        </div>
+        <div class="nav-buttons">
+          <button class="btn btn-primary btn-lg" id="btn-intro-${introNum}"
+                  onclick="goTo(${introNum+1})" disabled>Continuar →</button>
+        </div>
+      </div>`;
+    container.insertBefore(intro, anchor);
+    INTRO_SCREENS.add(introNum);
+    n++;
+
+    // ── 5 telas de tarefa ──
+    for (let i = 0; i < TASKS_PER_BLOCK; i++) {
+      const gIdx = bi * TASKS_PER_BLOCK + i;      // índice em TASKS
+      const task = TASKS[gIdx];
+      const num = n;
+      const dots = Array.from({length: TASKS_PER_BLOCK},
+        (_, k) => `<div class="task-dot ${k < i ? 'done' : k === i ? 'active' : ''}"></div>`).join('');
+
+      const div = document.createElement('div');
+      div.className = 'screen';
+      div.id = 'screen-' + num;
+      div.innerHTML = `
+        <div class="card">
+          <div class="task-counter">${dots}</div>
+          <div class="instruction-box">
+            <strong>${TASK_PROMPT}</strong>
+            ${TASK_PROMPT_SUB}
+          </div>
+          <div class="zoom-hint">🔍 Toque na lupa para ampliar a imagem</div>
+          <div class="conjoint-pair">
+            <div class="conjoint-card" id="cj-${gIdx}-left" onclick="selectProfile(${gIdx},'left')">
+              ${taskFrameHTML(block, task.left.ctx, task.left, 'Mensagem 1')}
+              <div class="choice-label">Compartilhar esta
+                <button class="zoom-btn" onclick="event.stopPropagation();openCardZoom(this)" aria-label="Ampliar mensagem">🔍</button>
+              </div>
+            </div>
+            <div class="conjoint-card" id="cj-${gIdx}-right" onclick="selectProfile(${gIdx},'right')">
+              ${taskFrameHTML(block, task.right.ctx, task.right, 'Mensagem 2')}
+              <div class="choice-label">Compartilhar esta
+                <button class="zoom-btn" onclick="event.stopPropagation();openCardZoom(this)" aria-label="Ampliar mensagem">🔍</button>
+              </div>
+            </div>
+          </div>
+          <div class="alert" id="alert-cj-${gIdx}">Por favor, escolha uma das duas mensagens para continuar.</div>
+          <div class="nav-buttons">
+            <button class="btn btn-primary" onclick="requireProfile(${gIdx}, ${num+1})">Próximo →</button>
+          </div>
+        </div>`;
+      container.insertBefore(div, anchor);
+      n++;
+    }
+  });
+}
+
+// ── Animação da conversa + tempo mínimo na tela de introdução ────────
+// As mensagens surgem uma a uma. O botão "Continuar" só libera depois que a
+// última aparece E de cumprido o tempo mínimo, o que vier por último.
+const MIN_INTRO_MS = 3000;
+const MSG_DELAY_MS = 700;   // intervalo entre mensagens
+const MSG_START_MS = 400;   // atraso antes da primeira
+const introPlayed = {};
+
+function playIntro(n) {
+  if (introPlayed[n]) return;
+  introPlayed[n] = true;
+
+  const msgs = [...document.querySelectorAll(`#chat-${n} .wa__msg`)];
+  const btn = document.getElementById(`btn-intro-${n}`);
+  msgs.forEach((m, i) => setTimeout(() => m.classList.add('show'), MSG_START_MS + i * MSG_DELAY_MS));
+
+  const animEnd = MSG_START_MS + msgs.length * MSG_DELAY_MS;
+  const unlockIn = Math.max(MIN_INTRO_MS, animEnd);
+
+  btn.disabled = true;
+  let left = Math.ceil(unlockIn / 1000);
+  btn.textContent = `Aguarde ${left}s…`;
+  const timer = setInterval(() => {
+    left--;
+    if (left > 0) { btn.textContent = `Aguarde ${left}s…`; return; }
+    clearInterval(timer);
+  }, 1000);
+  setTimeout(() => {
+    clearInterval(timer);
+    btn.disabled = false;
+    btn.textContent = 'Continuar →';
+  }, unlockIn);
+}
+
+function preloadImages() {
+  const seen = new Set();
+  TASKS.forEach(t => [t.left, t.right].forEach(p => {
+    [p.img, p.rendered ? p.photo : null].forEach(src => {
+      if (src && !seen.has(src)) { seen.add(src); const im = new Image(); im.src = src; }
+    });
+  }));
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  INTERAÇÃO
+// ═══════════════════════════════════════════════════════════════════
+function selectProfile(idx, side) {
+  ['left','right'].forEach(s => document.getElementById(`cj-${idx}-${s}`)?.classList.remove('selected'));
+  document.getElementById(`cj-${idx}-${side}`)?.classList.add('selected');
+  TASKS[idx].choice = side;
+  document.getElementById(`alert-cj-${idx}`)?.classList.remove('show');
+}
+
+function requireProfile(idx, next) {
+  if (!TASKS[idx].choice) { document.getElementById(`alert-cj-${idx}`)?.classList.add('show'); return; }
+  if (TASKS[idx].rt_ms === null && screenEnterTs !== null) TASKS[idx].rt_ms = Date.now() - screenEnterTs;
+  goTo(next);
+}
+
+function setScale(key, val, btn) {
+  const c = document.getElementById('scale-' + key);
+  if (!c) return;
+  c.querySelectorAll('.scale-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  responses[key] = val;
+}
+
+// ── PERGUNTAS CONDICIONAIS SOBRE PARTIDOS ────────────────────────────
+function renderPartyOptions(name) {
+  const order = shuffle(PARTIES).concat([PARTY_LAST]);
+  PARTY_ORDER[name] = order;
+  document.getElementById('q-' + name).innerHTML = order.map(p =>
+    `<label class="opt"><input type="radio" name="${name}" value="${p}"><span>${p}</span></label>`
+  ).join('');
+}
+
+function togglePartyFollowup(parentName, childName) {
+  const show = radioVal(parentName) === '1';
+  document.getElementById('block-' + childName).style.display = show ? 'block' : 'none';
+  if (!show) {   // limpa a resposta se o respondente mudar de ideia
+    document.querySelectorAll(`input[name="${childName}"]`).forEach(i => {
+      i.checked = false; i.closest('.opt')?.classList.remove('selected');
+    });
+    delete responses[childName];
+  }
+}
+
+const thermoTouched = {};
+function onThermo(id) {
+  const el = document.getElementById(id);
+  const out = document.getElementById('val-' + id);
+  thermoTouched[id] = true;
+  out.textContent = el.value;
+  out.classList.remove('untouched');
+  responses[id] = Number(el.value);
+}
+
+// Amplia o conteúdo compartilhado. Como ele pode ser uma imagem OU markup
+// desenhado, o que vai para a lupa é um clone do próprio elemento.
+function openCardZoom(btn) {
+  const card = btn.closest('.conjoint-card').querySelector('.wa__cardwrap');
+  if (!card) return;
+  const holder = document.getElementById('lightbox-content');
+  holder.innerHTML = '';
+  holder.appendChild(card.cloneNode(true));
+  document.getElementById('lightbox').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('show');
+  document.getElementById('lightbox-content').innerHTML = '';
+  document.body.style.overflow = '';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  NAVEGAÇÃO
+// ═══════════════════════════════════════════════════════════════════
+function goTo(n) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById('screen-' + n);
+  if (!target) return;
+  target.classList.add('active');
+  currentScreen = n;
+  screenEnterTs = Date.now();
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (INTRO_SCREENS.has(n)) playIntro(n);
+}
+
+function sectionLabel(n) {
+  if (n === 0) return 'Seção 1 de 5';
+  if (n <= 2) return 'Seção 2 de 5';
+  if (n <= 8) return 'Seção 3 de 5';
+  if (n <= 14) return 'Seção 4 de 5';
+  return 'Seção 5 de 5';
+}
+
+function updateProgress() {
+  if (currentScreen === NO_CONSENT_SCREEN) return;
+  const pct = Math.round((currentScreen / (TOTAL_SCREENS - 1)) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = currentScreen + ' de ' + (TOTAL_SCREENS - 1);
+  document.getElementById('section-label').textContent = sectionLabel(currentScreen);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  VALIDAÇÃO
+// ═══════════════════════════════════════════════════════════════════
+function radioVal(name) {
+  const el = document.querySelector(`input[name="${name}"]:checked`);
+  return el ? el.value : null;
+}
+
+function validateRadios(names, alertId, next) {
+  const missing = names.filter(n => radioVal(n) === null);
+  const alertEl = document.getElementById(alertId);
+  if (missing.length) {
+    alertEl.classList.add('show');
+    document.getElementById('q-' + missing[0])?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return false;
+  }
+  alertEl.classList.remove('show');
+  names.forEach(n => { responses[n] = radioVal(n); });
+  return true;
+}
+
+let surveyStarted = false;
+function startSurvey() {
+  if (surveyStarted) return;          // um toque duplo não pode gerar as telas duas vezes
+  const c = radioVal('consent');
+  const alertEl = document.getElementById('alert-consent');
+  if (c === null) { alertEl.classList.add('show'); return; }
+  alertEl.classList.remove('show');
+  surveyStarted = true;
+  responses.consent = c;
+  responses.start_time = new Date().toISOString();
+  if (c === '0') { goTo(NO_CONSENT_SCREEN); return; }
+
+  buildAllTasks();
+  generateConjointScreens();
+  preloadImages();
+  responses.block_order = BLOCK_ORDER.join('');
+  goTo(1);
+}
+
+function validateScreen1() {
+  const alertEl = document.getElementById('alert-s1');
+  const missing = ['interesse','compartilha'].filter(n => radioVal(n) === null);
+  if (missing.length || responses.influencia === undefined) {
+    alertEl.classList.add('show');
+    const firstId = missing.length ? 'q-' + missing[0] : 'scale-influencia';
+    document.getElementById(firstId)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  alertEl.classList.remove('show');
+  responses.interesse = radioVal('interesse');
+  responses.compartilha = radioVal('compartilha');
+  goTo(2);
+}
+
+function validateScreen2() {
+  const alertEl = document.getElementById('alert-s2');
+  const names = ['partido_sim','partido_nao','bolso_anti'];
+  // as perguntas de partido só são obrigatórias quando a filtro foi respondida "Sim"
+  if (radioVal('partido_sim') === '1') names.splice(1, 0, 'partido_gosta');
+  if (radioVal('partido_nao') === '1') names.splice(names.indexOf('partido_nao') + 1, 0, 'partido_menos');
+
+  const missing = names.filter(n => radioVal(n) === null);
+  const thermoMissing = ['termo_petistas','termo_antipetistas'].filter(k => !thermoTouched[k]);
+  if (missing.length || thermoMissing.length) {
+    alertEl.classList.add('show');
+    const el = missing.length ? document.getElementById('q-' + missing[0]) : document.getElementById(thermoMissing[0]);
+    el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  alertEl.classList.remove('show');
+  names.forEach(n => { responses[n] = radioVal(n); });
+  responses.partido_gosta_order = PARTY_ORDER.partido_gosta.join('|');
+  responses.partido_menos_order = PARTY_ORDER.partido_menos.join('|');
+  goTo(3);
+}
+
+function validateScreen15() {
+  const alertEl = document.getElementById('alert-s15');
+  const names = ['genero','escolaridade','renda'];
+  const missing = names.filter(n => radioVal(n) === null);
+  const idadeEl = document.getElementById('idade');
+  const idade = parseInt(idadeEl.value, 10);
+  const idadeOk = !isNaN(idade) && idade >= 16 && idade <= 110;
+  if (missing.length || !idadeOk) {
+    alertEl.textContent = !idadeOk && !missing.length
+      ? 'Por favor, informe uma idade válida (entre 16 e 110 anos).'
+      : 'Por favor, responda todas as perguntas desta página.';
+    alertEl.classList.add('show');
+    (missing.length ? document.getElementById('q-' + missing[0]) : idadeEl)
+      ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  alertEl.classList.remove('show');
+  names.forEach(n => { responses[n] = radioVal(n); });
+  responses.idade = idade;
+  goTo(16);
+}
+
+function finishSurvey() {
+  const alertEl = document.getElementById('alert-s16');
+  const names = ['raca','religiao','status'];
+  const missing = names.filter(n => radioVal(n) === null);
+  const estado = document.getElementById('estado').value;
+  if (missing.length || !estado) {
+    alertEl.classList.add('show');
+    const el = missing.length ? document.getElementById('q-' + missing[0])
+                              : document.getElementById('estado');
+    el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  alertEl.classList.remove('show');
+  names.forEach(n => { responses[n] = radioVal(n); });
+  responses.estado = estado;
+  goTo(17);
+  submitResponses();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  ENVIO
+// ═══════════════════════════════════════════════════════════════════
+function buildPayload() {
+  responses.respondent_id  = RESPONDENT_ID;
+  responses.survey_version = SURVEY_VERSION;
+  responses.end_time       = new Date().toISOString();
+  responses.user_agent     = navigator.userAgent;
+  responses.screen_w       = window.screen ? window.screen.width : null;
+  responses.block_order    = BLOCK_ORDER ? BLOCK_ORDER.join('') : null;
+  if (BLOCK_CONTEXT) {
+    // Bloco A: as mensagens são fixas e a ORDEM varia por card — a ordem de cada
+    // card fica em left_ctx/right_ctx na aba conjoint_long.
+    responses.context_A = [MSG_FLAVIO, MSG_FORA].join(' | ');
+    responses.context_B = BLOCK_CONTEXT.B.msgs.map(m => m.text).join(' | ');
+  }
+
+  const conjoint = (TASKS || []).map(t => ({
+    respondent_id: RESPONDENT_ID,
+    task_global:   t.task_global,
+    block:         t.block,
+    block_position: BLOCK_ORDER.indexOf(t.block) + 1,
+    task_in_block: t.task_in_block,
+    rt_ms:         t.rt_ms,
+    chosen_side:   t.choice,
+    left_story:    t.left.story,   left_veracity:  t.left.veracity,
+    left_source:   t.left.source,  left_virality:  t.left.virality,
+    left_valence:  t.left.valence, left_profile:   t.left.profile_id,
+    left_ctx:      t.left.ctx.map(m => m.text).join(' | '),
+    right_story:   t.right.story,  right_veracity: t.right.veracity,
+    right_source:  t.right.source, right_virality: t.right.virality,
+    right_valence: t.right.valence, right_profile: t.right.profile_id,
+    right_ctx:     t.right.ctx.map(m => m.text).join(' | '),
+    chosen_story:    t.choice ? t[t.choice].story : null,
+    chosen_veracity: t.choice ? t[t.choice].veracity : null,
+    chosen_source:   t.choice ? t[t.choice].source : null,
+    chosen_virality: t.choice ? t[t.choice].virality : null,
+    chosen_valence:  t.choice ? t[t.choice].valence : null,
+    chosen_profile:  t.choice ? t[t.choice].profile_id : null
+  }));
+
+  return { respondent: responses, conjoint: conjoint };
+}
+
+function submitResponses() {
+  if (submitted) return;
+  const statusEl = document.getElementById('submit-status');
+  const errEl = document.getElementById('submit-error');
+  errEl.classList.remove('show');
+  statusEl.textContent = 'Enviando suas respostas…';
+  statusEl.style.display = 'block';
+
+  const payload = buildPayload();
+
+  if (!ENDPOINT || ENDPOINT.indexOf('COLE_AQUI') === 0) {
+    console.log('Payload:', payload);   // só no modo de teste
+    statusEl.textContent = '⚠️ Modo de teste: endpoint não configurado. Respostas no console do navegador.';
+    return;
+  }
+
+  fetch(ENDPOINT, {
+    method: 'POST',
+    // text/plain evita o preflight CORS do Apps Script
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload)
+  })
+  .then(r => r.json())
+  .then(res => {
+    if (res && res.status === 'ok') {
+      submitted = true;
+      statusEl.textContent = '✅ Respostas enviadas com sucesso.';
+    } else { throw new Error('resposta inesperada'); }
+  })
+  .catch(() => {
+    statusEl.style.display = 'none';
+    errEl.classList.add('show');
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  const sel = document.getElementById('estado');
+  UFS.forEach(uf => {
+    const o = document.createElement('option');
+    o.value = uf; o.textContent = UF_NAMES[uf] + ' (' + uf + ')';
+    sel.appendChild(o);
+  });
+
+  renderPartyOptions('partido_gosta');
+  renderPartyOptions('partido_menos');
+
+  document.addEventListener('change', e => {
+    if (e.target.type === 'radio') {
+      document.querySelectorAll(`input[name="${e.target.name}"]`).forEach(inp => {
+        inp.closest('.opt')?.classList.toggle('selected', inp.checked);
+      });
+      if (e.target.name === 'partido_sim') togglePartyFollowup('partido_sim', 'partido_gosta');
+      if (e.target.name === 'partido_nao') togglePartyFollowup('partido_nao', 'partido_menos');
+    }
+  });
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+  window.addEventListener('beforeunload', e => {
+    if (currentScreen > 0 && currentScreen < 17) { e.preventDefault(); e.returnValue = ''; }
+  });
+
+  updateProgress();
+});
+</script>
+</body>
+</html>
