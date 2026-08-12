@@ -1,24 +1,97 @@
 # Survey de conjoint — Eleições 2026
 
-Survey de página única, sem dependências externas. Publicado em `fernandobmello.com/conjoint`.
+Survey de página única, sem dependências externas: um único `index.html` com
+HTML, CSS e JavaScript, mais as imagens. Não precisa de servidor, build nem
+framework — basta servir a pasta como site estático.
+
+Esta é a cópia publicada em <https://www.fernandobmello.com/conjoint/>. A cópia
+compartilhada com o IBPAD, idêntica no conteúdo, fica em
+<https://github.com/fernandobmello/conjoint-eleicoes-2026>.
 
 ```
-conjoint/
 ├── index.html              ← o survey inteiro (HTML + CSS + JS)
 ├── apps-script.gs          ← backend Google Sheets (instruções dentro do arquivo)
+├── assets/                 ← as 96 células como imagem + 12 fotos (21 MB)
 ├── extract_cards.py        ← recorta os 48 cards de notícia dos prints originais
 ├── extract_photos.py       ← recorta as 12 fotos usadas pelas variantes "post"
 ├── test_randomization.js   ← simula 5.000 respondentes e confere o balanceamento
-├── assets/                 ← 48 cards + 12 fotos, 800 px de largura (5,0 MB)
-└── README.md
+├── export_post_cards.js    ← gera os 48 PNGs das variantes "post" a partir do index.html
+(o workflow que publica no Pages fica na raiz deste repositório)
 ```
 
-## Antes de publicar
+## Como colocar no ar
 
-1. Instale o `apps-script.gs` numa planilha nova (passo a passo no topo do arquivo).
-2. Cole a URL `/exec` gerada na constante `ENDPOINT`, no início do `<script>` de `index.html`.
-   Enquanto isso não for feito, o survey roda em **modo de teste**: ele completa
-   normalmente e imprime o payload no console do navegador, sem gravar nada.
+### 1. Criar o backend (obrigatório — sem isso nada é gravado)
+
+1. Crie uma planilha nova em <https://sheets.new>.
+2. **Extensões → Apps Script**, apague o conteúdo e cole o `apps-script.gs` inteiro.
+3. **Implantar → Nova implantação → App da Web**, com
+   *Executar como:* você e *Quem pode acessar:* **Qualquer pessoa**.
+4. Copie a URL gerada (termina em `/exec`).
+
+### 2. Ligar o survey ao backend
+
+Abra o `index.html` e troque a constante `ENDPOINT`, logo no começo do `<script>`:
+
+```js
+const ENDPOINT = 'https://script.google.com/macros/s/SEU_ID_AQUI/exec';
+```
+
+Enquanto isso não for feito, o survey funciona do início ao fim mas roda em
+**modo de teste**: a tela final avisa "endpoint não configurado" e nada é gravado.
+
+### 3. Publicar
+
+Neste repositório o Pages já publica tudo a cada push na `main`, e o survey sai
+em `/conjoint/`.
+
+Como é um site estático, também funciona em qualquer outra hospedagem: basta
+subir todos os arquivos mantendo a pasta `assets/` ao lado do `index.html`.
+
+### 4. Antes de ir a campo
+
+- Faça um teste completo e confirme que a linha apareceu nas abas `respondents`
+  e `conjoint_long` da planilha.
+- Confira a classificação de valência das notícias (ver seção adiante).
+- Se quiser mudar textos, grupos ou o pool de mensagens, tudo está nas constantes
+  no topo do `<script>` do `index.html` — não é preciso mexer no resto do código.
+
+## As 96 células como imagem
+
+`assets/` contém um arquivo para cada uma das 96 células:
+
+| Fonte | Arquivos | Origem |
+|---|---|---|
+| `g1`, `no_source` | 48 `.jpg` | recortados dos prints originais |
+| `post`, `post_source` | 48 `.png` | rasterizados do próprio survey |
+
+O survey **não usa** os 48 PNGs: ele desenha essas duas fontes em CSS, a partir
+da manchete e de `photo_<noticia>.jpg`. Os PNGs existem para portar o survey
+para outra plataforma (Qualtrics, LimeSurvey etc.), para revisão e para
+pré-registro.
+
+Para não haver divergência entre os dois, o `export_post_cards.js` **lê o CSS e
+a função `cardHTML()` de dentro do `index.html`** — não reescreve o desenho. Se
+mexer no visual dessas variantes, rode de novo:
+
+```bash
+node export_post_cards.js     # precisa do Google Chrome e do ImageMagick
+```
+
+As imagens saem com 836 px de largura, já sobre o fundo do chat do WhatsApp —
+e não com fundo transparente, de propósito: num fundo branco, um balão branco
+com pílulas brancas ficaria praticamente invisível.
+
+## Os prints originais não estão aqui
+
+`assets/` já vem pronto. Os prints originais do WhatsApp (~89 MB), dos quais os
+cards foram recortados, ficam fora do repositório. Eles só são necessários para
+**regerar** as imagens:
+
+```bash
+python3 extract_cards.py /caminho/para/os/prints   # recorta os 48 cards
+python3 extract_photos.py                          # recorta as 12 fotos
+```
 
 ## Desenho do conjoint
 
@@ -118,7 +191,7 @@ perfis): ordem dos blocos 50,0/50,0; cada notícia ≈8,3%; cada nível de fonte
 zero repetições dentro de bloco, zero asset inválido.
 
 ```bash
-node /Users/Mello/Dropbox/fernandobmello-site/conjoint/test_randomization.js
+node test_randomization.js
 ```
 
 ## Assets
@@ -138,13 +211,6 @@ assets/  60 arquivos, 5,0 MB
 Todos com 800 px de largura. As variantes `post` e `post_source` não têm arquivo:
 são montadas em CSS a partir da manchete + `photo_<noticia>.jpg`, então as 48
 células dessas duas fontes saem das mesmas 12 fotos.
-
-Para regerar a partir dos originais em `publications/influencers/assets/conjoint`:
-
-```bash
-python3 extract_cards.py    # recorta os 48 cards
-python3 extract_photos.py   # recorta as 12 fotos
-```
 
 `extract_cards.py` separa o card das bolhas de conversa e da barra de digitação
 pela geometria (todos são quase brancos): acha faixas brancas largas, agrupa pela
@@ -194,7 +260,10 @@ depois.
 ## Dados gravados
 
 **Aba `respondents`** — 1 linha por respondente: `respondent_id`, `block_order`,
-`context_A`/`context_B` (mensagens sorteadas de cada bloco),
+`context_A`/`context_B` (mensagens sorteadas de cada bloco), o bloco de consumo
+de notícias da tela 3 (`midia` e `plataformas` como lista separada por `|`,
+`busca`, `exp_odio`, `exp_briga`, `silenciou`, `saiu_grupo`, `evitou`,
+`voluntario_2018/2022/2026`),
 `start_time`/`end_time`, consentimento, as 3 perguntas pré-tratamento, partidos
 (`partido_sim`/`partido_gosta`, `partido_nao`/`partido_menos`, mais as duas
 colunas de ordem), os 2 termômetros (0–100), bolsonarista/antipetista, e toda a
@@ -228,13 +297,14 @@ console do navegador quando o `ENDPOINT` ainda não foi configurado (modo de tes
 | 0 | Consentimento (recusa → tela 99, encerra) |
 | 1 | Interesse por política · importância de influenciar (0–7) · frequência de compartilhamento |
 | 2 | Partidos (+ 2 perguntas condicionais) · termômetros · bolsonarista vs. antipetista |
-| 3–8 | Primeiro bloco: introdução + 5 tarefas |
-| 9–14 | Segundo bloco: introdução + 5 tarefas |
-| 15 | Gênero · idade · escolaridade · renda |
-| 16 | Cor/raça · estado · religiosidade · perda de status |
-| 17 | Agradecimento + envio |
+| 3 | Consumo de notícias · plataformas · busca por política · exposição a conflito · evitação · voluntariado em 2018/2022/2026 |
+| 4–9 | Primeiro bloco: introdução + 5 tarefas |
+| 10–15 | Segundo bloco: introdução + 5 tarefas |
+| 16 | Gênero · idade · escolaridade · renda |
+| 17 | Cor/raça · estado · religiosidade · perda de status |
+| 18 | Agradecimento + envio |
 
-As telas 3–14 são geradas por JavaScript no momento do consentimento, já na ordem
+As telas 4–15 são geradas por JavaScript no momento do consentimento, já na ordem
 sorteada. Todas as perguntas são obrigatórias e validadas antes de avançar; não há
 botão de voltar de dentro do conjoint para as telas anteriores.
 

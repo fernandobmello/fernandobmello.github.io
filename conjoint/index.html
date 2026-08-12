@@ -66,6 +66,19 @@
   .question-block { margin-bottom: 28px; }
   .question-block:last-of-type { margin-bottom: 0; }
   .followup { border-left: 3px solid #bfdbfe; padding-left: 15px; margin-top: -10px; }
+
+  /* ── BATERIAS ITEM A ITEM (uma linha por afirmação) ── */
+  .matrix-item { padding-top: 14px; margin-top: 14px; border-top: 1px solid var(--border); }
+  .matrix-item:first-child { padding-top: 0; margin-top: 0; border-top: none; }
+  .matrix-label { font-size: 0.92rem; line-height: 1.4; margin-bottom: 9px; }
+  .inline-opts { display: flex; gap: 7px; }
+  .inline-opts .opt { flex: 1; padding: 10px 6px; justify-content: center; text-align: center; gap: 7px; }
+  .inline-opts .opt span { flex: 0 1 auto; font-size: 0.84rem; }
+  /* em telas estreitas as opções longas empilham em vez de espremer */
+  @media (max-width: 560px) {
+    .inline-opts { flex-wrap: wrap; }
+    .inline-opts .opt { flex: 1 1 calc(50% - 4px); }
+  }
   .question-text { font-size: 1rem; font-weight: 600; line-height: 1.5; margin-bottom: 10px; }
   .question-subtext { font-size: 0.82rem; color: var(--muted); margin-bottom: 14px; line-height: 1.45; }
 
@@ -472,10 +485,141 @@
     </div>
   </div>
 
-  <!-- ══════════ SCREENS 3–14 — CONJOINTS (gerados dinamicamente) ══════════ -->
+  <!-- ══════════ SCREEN 3 — CONSUMO DE NOTÍCIAS E EXPERIÊNCIA NAS REDES ══════════ -->
+  <div class="screen" id="screen-3">
+    <div class="card">
+      <div class="question-block">
+        <div class="question-text">Muitas pessoas acessam notícias de diferentes maneiras. Pensando nos seus próprios hábitos de consumo de notícias, você acessa notícias sobre <strong>POLÍTICA</strong> de alguma das seguintes formas?</div>
+        <div class="question-subtext">Marque TODAS as opções que se aplicam.</div>
+        <div class="options" id="q-midia">
+          <label class="opt"><input type="checkbox" name="midia" value="impresso"><span>Leio notícias impressas (em jornais ou revistas)</span></label>
+          <label class="opt"><input type="checkbox" name="midia" value="tv"><span>Assisto a notícias na televisão</span></label>
+          <label class="opt"><input type="checkbox" name="midia" value="radio"><span>Ouço notícias no rádio</span></label>
+          <label class="opt"><input type="checkbox" name="midia" value="internet"><span>Acesso notícias pela internet, por meio de mecanismos de busca e sites</span></label>
+          <label class="opt"><input type="checkbox" name="midia" value="redes"><span>Acesso notícias por meio de redes sociais ou aplicativos de mensagens (WhatsApp, Facebook)</span></label>
+          <label class="opt"><input type="checkbox" name="midia" value="familia"><span>Recebo notícias conversando com familiares</span></label>
+          <label class="opt"><input type="checkbox" name="midia" value="nao_familia"><span>Recebo notícias conversando com pessoas que não são da minha família (vizinhos, colegas, conhecidos)</span></label>
+        </div>
+      </div>
 
-  <!-- ══════════ SCREEN 15 — DEMOGRAFIA 1 ══════════ -->
-  <div class="screen" id="screen-15">
+      <div class="question-block">
+        <div class="question-text">Pensando especificamente nas redes sociais e aplicativos de mensagens, em quais das seguintes plataformas você recebeu conteúdo político na última semana?</div>
+        <div class="question-subtext">Marque TODAS as opções que se aplicam.</div>
+        <div class="options" id="q-plataformas">
+          <label class="opt"><input type="checkbox" name="plataformas" value="facebook"><span>Facebook</span></label>
+          <label class="opt"><input type="checkbox" name="plataformas" value="twitter"><span>Twitter</span></label>
+          <label class="opt"><input type="checkbox" name="plataformas" value="youtube"><span>YouTube</span></label>
+          <label class="opt"><input type="checkbox" name="plataformas" value="instagram"><span>Instagram</span></label>
+          <label class="opt"><input type="checkbox" name="plataformas" value="whatsapp"><span>WhatsApp</span></label>
+          <label class="opt"><input type="checkbox" name="plataformas" value="tiktok"><span>TikTok</span></label>
+          <label class="opt"><input type="checkbox" name="plataformas" value="telegram"><span>Telegram</span></label>
+        </div>
+      </div>
+
+      <div class="question-block">
+        <div class="question-text">Algumas pessoas passam mais tempo do que outras acompanhando política. Pensando em você, em média, quantas vezes por dia você procura ativamente por conteúdo político em meios de comunicação tradicionais, redes sociais ou aplicativos de mensagens?</div>
+        <div class="options" id="q-busca">
+          <label class="opt"><input type="radio" name="busca" value="1"><span>Quase nenhuma vez</span></label>
+          <label class="opt"><input type="radio" name="busca" value="2"><span>Uma vez por dia</span></label>
+          <label class="opt"><input type="radio" name="busca" value="3"><span>2 a 3 vezes por dia</span></label>
+          <label class="opt"><input type="radio" name="busca" value="4"><span>Muitas vezes por dia</span></label>
+          <label class="opt"><input type="radio" name="busca" value="5"><span>Quase todas as horas do dia</span></label>
+        </div>
+      </div>
+
+      <div class="question-block">
+        <div class="question-text">Pensando na forma como você utiliza redes sociais e aplicativos de mensagens, como Facebook, Instagram e WhatsApp, indique com que frequência você vivenciou cada uma das situações abaixo no último mês.</div>
+        <div class="matrix" id="q-exposicao">
+          <div class="matrix-item">
+            <div class="matrix-label">Vi mensagens políticas de ódio ou ofensivas.</div>
+            <div class="inline-opts">
+              <label class="opt"><input type="radio" name="exp_odio" value="0"><span>Nunca</span></label>
+              <label class="opt"><input type="radio" name="exp_odio" value="1"><span>Uma vez</span></label>
+              <label class="opt"><input type="radio" name="exp_odio" value="2"><span>Algumas vezes</span></label>
+              <label class="opt"><input type="radio" name="exp_odio" value="3"><span>Frequentemente</span></label>
+            </div>
+          </div>
+          <div class="matrix-item">
+            <div class="matrix-label">Vi pessoas discutindo ou brigando por causa de política.</div>
+            <div class="inline-opts">
+              <label class="opt"><input type="radio" name="exp_briga" value="0"><span>Nunca</span></label>
+              <label class="opt"><input type="radio" name="exp_briga" value="1"><span>Uma vez</span></label>
+              <label class="opt"><input type="radio" name="exp_briga" value="2"><span>Algumas vezes</span></label>
+              <label class="opt"><input type="radio" name="exp_briga" value="3"><span>Frequentemente</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="question-block">
+        <div class="question-text">Você já fez alguma das seguintes coisas?</div>
+        <div class="matrix" id="q-evitacao">
+          <div class="matrix-item">
+            <div class="matrix-label">Silenciou uma pessoa ou um grupo por causa de conflitos políticos.</div>
+            <div class="inline-opts">
+              <label class="opt"><input type="radio" name="silenciou" value="1"><span>Sim</span></label>
+              <label class="opt"><input type="radio" name="silenciou" value="0"><span>Não</span></label>
+            </div>
+          </div>
+          <div class="matrix-item">
+            <div class="matrix-label">Saiu de uma rede social ou de um grupo por causa de política.</div>
+            <div class="inline-opts">
+              <label class="opt"><input type="radio" name="saiu_grupo" value="1"><span>Sim</span></label>
+              <label class="opt"><input type="radio" name="saiu_grupo" value="0"><span>Não</span></label>
+            </div>
+          </div>
+          <div class="matrix-item">
+            <div class="matrix-label">Evitou abrir redes sociais ou grupos nos quais política é discutida com frequência.</div>
+            <div class="inline-opts">
+              <label class="opt"><input type="radio" name="evitou" value="1"><span>Sim</span></label>
+              <label class="opt"><input type="radio" name="evitou" value="0"><span>Não</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="question-block">
+        <div class="question-text">Você se voluntariou para compartilhar conteúdo de campanha nas seguintes eleições:</div>
+        <div class="matrix" id="q-voluntario">
+          <div class="matrix-item">
+            <div class="matrix-label">Eleições de <strong>2018</strong></div>
+            <div class="inline-opts">
+              <label class="opt"><input type="radio" name="voluntario_2018" value="sim"><span>Sim</span></label>
+              <label class="opt"><input type="radio" name="voluntario_2018" value="nao"><span>Não</span></label>
+              <label class="opt"><input type="radio" name="voluntario_2018" value="nr"><span>Prefiro não responder</span></label>
+            </div>
+          </div>
+          <div class="matrix-item">
+            <div class="matrix-label">Eleições de <strong>2022</strong></div>
+            <div class="inline-opts">
+              <label class="opt"><input type="radio" name="voluntario_2022" value="sim"><span>Sim</span></label>
+              <label class="opt"><input type="radio" name="voluntario_2022" value="nao"><span>Não</span></label>
+              <label class="opt"><input type="radio" name="voluntario_2022" value="nr"><span>Prefiro não responder</span></label>
+            </div>
+          </div>
+          <div class="matrix-item">
+            <div class="matrix-label">Eleições de <strong>2026</strong></div>
+            <div class="inline-opts">
+              <label class="opt"><input type="radio" name="voluntario_2026" value="sim"><span>Sim</span></label>
+              <label class="opt"><input type="radio" name="voluntario_2026" value="nao"><span>Não</span></label>
+              <label class="opt"><input type="radio" name="voluntario_2026" value="nr"><span>Prefiro não responder</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert" id="alert-s3">Por favor, responda todas as perguntas desta página.</div>
+      <div class="nav-buttons">
+        <button class="btn btn-secondary" onclick="goTo(2)">← Voltar</button>
+        <button class="btn btn-primary" onclick="validateScreen3()">Próximo →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SCREENS 4–15 — CONJOINTS (gerados dinamicamente) ══════════ -->
+
+  <!-- ══════════ SCREEN 16 — DEMOGRAFIA 1 ══════════ -->
+  <div class="screen" id="screen-16">
     <div class="card">
       <div class="question-block">
         <div class="question-text">Qual é o seu gênero?</div>
@@ -511,15 +655,15 @@
         </div>
       </div>
 
-      <div class="alert" id="alert-s15">Por favor, responda todas as perguntas desta página.</div>
+      <div class="alert" id="alert-demo1">Por favor, responda todas as perguntas desta página.</div>
       <div class="nav-buttons">
-        <button class="btn btn-primary" onclick="validateScreen15()">Próximo →</button>
+        <button class="btn btn-primary" onclick="validateDemo1()">Próximo →</button>
       </div>
     </div>
   </div>
 
-  <!-- ══════════ SCREEN 16 — DEMOGRAFIA 2 ══════════ -->
-  <div class="screen" id="screen-16">
+  <!-- ══════════ SCREEN 17 — DEMOGRAFIA 2 ══════════ -->
+  <div class="screen" id="screen-17">
     <div class="card">
       <div class="question-block">
         <div class="question-text">Qual é a sua cor ou raça?</div>
@@ -562,16 +706,16 @@
         </div>
       </div>
 
-      <div class="alert" id="alert-s16">Por favor, responda todas as perguntas desta página.</div>
+      <div class="alert" id="alert-demo2">Por favor, responda todas as perguntas desta página.</div>
       <div class="nav-buttons">
-        <button class="btn btn-secondary" onclick="goTo(15)">← Voltar</button>
-        <button class="btn btn-primary btn-lg" onclick="finishSurvey()">Enviar respostas →</button>
+        <button class="btn btn-secondary" onclick="goTo(16)">← Voltar</button>
+        <button class="btn btn-primary btn-lg" onclick="validateDemo2()">Enviar respostas →</button>
       </div>
     </div>
   </div>
 
-  <!-- ══════════ SCREEN 17 — AGRADECIMENTO ══════════ -->
-  <div class="screen" id="screen-17">
+  <!-- ══════════ SCREEN 18 — AGRADECIMENTO ══════════ -->
+  <div class="screen" id="screen-18">
     <div class="card" style="text-align:center;">
       <div class="thanks-icon">🎉</div>
       <div class="thanks-title">Obrigado pela sua participação.</div>
@@ -757,10 +901,10 @@ const TASK_PROMPT = 'Quais das duas mensagens abaixo você prefere compartilhar 
 const TASK_PROMPT_SUB = 'Escolha uma obrigatoriamente.';
 
 // ── LAYOUT DE TELAS ──────────────────────────────────────────────────
-// 0 consentimento · 1–2 pré-tratamento · 3–14 conjoints (gerados) · 15–16 demografia · 17 fim
-const CONJ_ANCHOR   = 15;   // as telas geradas são inseridas ANTES desta
-const CONJ_START    = 3;
-const TOTAL_SCREENS = 18;
+// 0 consentimento · 1–3 pré-tratamento · 4–15 conjoints (gerados) · 16–17 demografia · 18 fim
+const CONJ_ANCHOR   = 16;   // as telas geradas são inseridas ANTES desta
+const CONJ_START    = 4;
+const TOTAL_SCREENS = 19;
 const NO_CONSENT_SCREEN = 99;
 
 // Partidos: a ordem é sorteada por respondente. "Outro" fica sempre por último.
@@ -1190,9 +1334,9 @@ function goTo(n) {
 
 function sectionLabel(n) {
   if (n === 0) return 'Seção 1 de 5';
-  if (n <= 2) return 'Seção 2 de 5';
-  if (n <= 8) return 'Seção 3 de 5';
-  if (n <= 14) return 'Seção 4 de 5';
+  if (n <= 3) return 'Seção 2 de 5';
+  if (n <= 9) return 'Seção 3 de 5';
+  if (n <= 15) return 'Seção 4 de 5';
   return 'Seção 5 de 5';
 }
 
@@ -1281,8 +1425,36 @@ function validateScreen2() {
   goTo(3);
 }
 
-function validateScreen15() {
-  const alertEl = document.getElementById('alert-s15');
+// Marcadas de uma pergunta "marque todas que se aplicam".
+function checkVals(name) {
+  return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(i => i.value);
+}
+
+function validateScreen3() {
+  const alertEl = document.getElementById('alert-s3');
+  const radios = ['busca', 'exp_odio', 'exp_briga', 'silenciou', 'saiu_grupo', 'evitou',
+                  'voluntario_2018', 'voluntario_2022', 'voluntario_2026'];
+  const boxes = ['midia', 'plataformas'];
+
+  const missingBox = boxes.filter(n => checkVals(n).length === 0);
+  const missingRadio = radios.filter(n => radioVal(n) === null);
+  if (missingBox.length || missingRadio.length) {
+    alertEl.classList.add('show');
+    const first = missingBox.length ? 'q-' + (missingBox[0] === 'midia' ? 'midia' : 'plataformas')
+                                    : null;
+    const el = first ? document.getElementById(first)
+                     : document.querySelector(`input[name="${missingRadio[0]}"]`)?.closest('.question-block, .matrix-item');
+    el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  alertEl.classList.remove('show');
+  boxes.forEach(n => { responses[n] = checkVals(n).join('|'); });
+  radios.forEach(n => { responses[n] = radioVal(n); });
+  goTo(4);
+}
+
+function validateDemo1() {
+  const alertEl = document.getElementById('alert-demo1');
   const names = ['genero','escolaridade','renda'];
   const missing = names.filter(n => radioVal(n) === null);
   const idadeEl = document.getElementById('idade');
@@ -1300,11 +1472,11 @@ function validateScreen15() {
   alertEl.classList.remove('show');
   names.forEach(n => { responses[n] = radioVal(n); });
   responses.idade = idade;
-  goTo(16);
+  goTo(17);
 }
 
-function finishSurvey() {
-  const alertEl = document.getElementById('alert-s16');
+function validateDemo2() {
+  const alertEl = document.getElementById('alert-demo2');
   const names = ['raca','religiao','status'];
   const missing = names.filter(n => radioVal(n) === null);
   const estado = document.getElementById('estado').value;
@@ -1318,7 +1490,7 @@ function finishSurvey() {
   alertEl.classList.remove('show');
   names.forEach(n => { responses[n] = radioVal(n); });
   responses.estado = estado;
-  goTo(17);
+  goTo(18);
   submitResponses();
 }
 
@@ -1428,7 +1600,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
 
   window.addEventListener('beforeunload', e => {
-    if (currentScreen > 0 && currentScreen < 17) { e.preventDefault(); e.returnValue = ''; }
+    if (currentScreen > 0 && currentScreen < 18) { e.preventDefault(); e.returnValue = ''; }
   });
 
   updateProgress();
