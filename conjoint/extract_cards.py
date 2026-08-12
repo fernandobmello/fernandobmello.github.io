@@ -13,12 +13,15 @@ a separação é geométrica, não por cor:
 
 Saída: cards/<nome>.jpg, todos com 800 px de largura.
 """
-import os, glob, json
+import os, sys, glob, json
 import numpy as np
 from PIL import Image
 
-SRC = '/Users/Mello/Dropbox/publications/influencers/assets/conjoint'
-OUT = '/Users/Mello/Dropbox/fernandobmello-site/conjoint/assets'
+HERE = os.path.dirname(os.path.abspath(__file__))
+# Pasta com os prints originais do WhatsApp. Eles NÃO estão neste repositório
+# (são ~89 MB). Passe o caminho como argumento ou use ./originais.
+SRC = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, 'originais')
+OUT = os.path.join(HERE, 'assets')
 W = 1000                 # largura de trabalho
 CARD_W = 800             # largura final do card
 MIN_RUN = 620
@@ -33,6 +36,30 @@ def header_end(a):
     red = a[:, :, 0].mean(axis=1)
     i = int(np.argmax(red > 120))
     return i if red[i] > 120 else 0
+
+def photo_bottom(a, top, bot, l, r):
+    """
+    Última linha da foto dentro do card. Abaixo dela vem só a faixa de
+    contadores, que é recortada fora: os números de reação e encaminhamento
+    passaram a ser desenhados em CSS, para que a viralização fique sob
+    controle em todas as 96 células (nos prints originais o nível "high"
+    variava de 4,2 mil a 21,3 mil de uma notícia para outra).
+    """
+    band = a[top:bot + 1, l:r]
+    w = band.shape[1]
+    mid = band[:, int(w * .06):int(w * .94)]
+    white = (mid > WHITE).all(axis=2).mean(axis=1)
+    rows = np.flatnonzero(white < 0.5)
+    if rows.size == 0:
+        return None
+    blocks, cur = [], [rows[0]]
+    for y in rows[1:]:
+        if y - cur[-1] <= 4:
+            cur.append(y)
+        else:
+            blocks.append(cur); cur = [y]
+    blocks.append(cur)
+    return top + max(blocks, key=len)[-1]
 
 def card_box(a):
     h = a.shape[0]
@@ -87,6 +114,12 @@ def main():
         if box is None:
             flagged.append((name, 'card não encontrado')); continue
         t, b, l, r = box
+        # corta a faixa de contadores, deixando uma folga branca abaixo da foto
+        pb = photo_bottom(np.asarray(im), t, b, l, r)
+        if pb is not None and pb + 8 < b:
+            b = min(pb + 8, b)
+        else:
+            flagged.append((name, 'faixa de contadores não localizada'))
         cw, ch = r - l, b - t + 1
         if ch < 250 or cw < 600:
             flagged.append((name, f'recorte suspeito {cw}x{ch}'))
@@ -107,8 +140,11 @@ def main():
             print("   ", n, "—", why)
     else:
         print("\nnenhum recorte suspeito")
-    with open(os.path.join(os.path.dirname(OUT), 'cards_meta.json'), 'w') as f:
+    with open(os.path.join(HERE, 'cards_meta.json'), 'w') as f:
         json.dump(meta, f, indent=1, sort_keys=True)
 
 if __name__ == '__main__':
+    if not os.path.isdir(SRC):
+        sys.exit(f'Pasta de originais não encontrada: {SRC}\n'
+                 f'Uso: python3 extract_cards.py /caminho/para/os/prints')
     main()

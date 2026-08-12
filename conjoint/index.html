@@ -218,9 +218,15 @@
   .wa--task .wa__input .mic { width: 28px; height: 28px; font-size: 0.8rem; }
   .wa__cardwrap { align-self: flex-start; max-width: 86%; max-height: 100%;
                   display: flex; flex-direction: column; gap: 5px; min-height: 0; }
-  .wa__card { display: block; width: 100%; height: auto; max-height: 100%;
-              object-fit: contain; object-position: left top;
-              border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,.16); }
+  /* card de notícia = imagem recortada + faixa de contadores desenhada */
+  .news-card { background: #fff; border-radius: 8px; overflow: hidden;
+               box-shadow: 0 1px 2px rgba(0,0,0,.16); display: flex;
+               flex-direction: column; min-height: 0; }
+  .wa__card { display: block; width: 100%; height: auto; min-height: 0;
+              object-fit: contain; object-position: left top; }
+  .card-counts { display: flex; align-items: center; padding: 7px 11px 9px;
+                 font-size: 0.68rem; color: #111b21; white-space: nowrap; flex: none; }
+  .card-counts span:first-child { margin-right: 20%; }
 
   /* ── VARIANTES "POST" (fonte = post e post_source) ──
      Não são card de notícia: são uma mensagem de texto encaminhada, com a foto
@@ -824,12 +830,31 @@ const FAKE_PAGE = { name: 'Brasil Notícias', kind: 'Página de notícias' };
 // posts originais (f3, f4, f5), aplicado agora às 12 notícias.
 const POST_CTA = ['Por que não falam sobre isso?', 'Compartilhe antes que apaguem'];
 
-// Contadores das variantes desenhadas. Iguais nos dois níveis de fonte
-// desenhados, para que fonte e viralização não fiquem confundidas.
-const COUNTS = {
-  high: { react: '21,3 mil', fwd: '28,7 mil' },
-  low:  { react: '21',       fwd: '9' }
-};
+// ── CONTADORES DE REAÇÃO E ENCAMINHAMENTO ────────────────────────────
+// Desenhados em CSS em TODAS as fontes, inclusive nos cards g1/no_source, cuja
+// faixa de contadores foi recortada fora da imagem. Nos prints originais o
+// nível "high" ia de 4,2 mil a 21,3 mil conforme a notícia — fonte e
+// viralização acabavam confundidas com a magnitude. Agora as duas faixas são
+// fixas e valem igual para as quatro fontes.
+const COUNT_RANGE = { high: [500, 1300], low: [5, 30] };
+
+// Sorteio determinístico: cada célula tem um par de números que nunca muda,
+// então a imagem exportada é sempre igual ao que o respondente vê.
+function hashStr(s) {
+  let h = 2166136261 >>> 0;
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+  return h >>> 0;
+}
+function pickIn(seed, [lo, hi]) { return lo + (hashStr(seed) % (hi - lo + 1)); }
+function fmtCount(n) { return n >= 1000 ? String(n).slice(0, -3) + '.' + String(n).slice(-3) : String(n); }
+
+function countsFor(profileId, virality) {
+  const range = COUNT_RANGE[virality];
+  return {
+    react: fmtCount(pickIn(profileId + '|reacoes', range)),
+    fwd:   fmtCount(pickIn(profileId + '|encaminhamentos', range))
+  };
+}
 
 // Se true, as 5 tarefas de um bloco usam 10 notícias distintas (sem repetição
 // dentro do bloco). Se false, cada perfil é sorteado de forma independente com
@@ -1073,12 +1098,16 @@ function chatHTML(block, screenNum) {
 // O conteúdo compartilhado: card de notícia (imagem) ou mensagem encaminhada
 // (desenhada em CSS), conforme o nível de fonte do perfil.
 function cardHTML(p, alt) {
+  const c = countsFor(p.profile_id || `${p.story}_${p.source}_${p.virality}`, p.virality);
   if (!p.rendered) {
+    // a imagem termina logo abaixo da foto; a faixa de contadores é esta aqui
     return `<div class="wa__cardwrap">
-      <img class="wa__card" src="${p.img}" alt="${alt}" loading="lazy">
+      <div class="news-card">
+        <img class="wa__card" src="${p.img}" alt="${alt}" loading="lazy">
+        <div class="card-counts"><span>👍😮🙏 ${c.react}</span><span>↗ ${c.fwd}</span></div>
+      </div>
     </div>`;
   }
-  const c = COUNTS[p.virality];
   const head = p.source === 'post_source' ? `
       <div class="post-head">
         <div class="flag" aria-hidden="true">🇧🇷</div>

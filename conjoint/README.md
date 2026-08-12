@@ -5,17 +5,18 @@ HTML, CSS e JavaScript, mais as imagens. Não precisa de servidor, build nem
 framework — basta servir a pasta como site estático.
 
 Esta é a cópia publicada em <https://www.fernandobmello.com/conjoint/>. A cópia
-compartilhada com o IBPAD, idêntica no conteúdo, fica em
-<https://github.com/fernandobmello/conjoint-eleicoes-2026>.
+compartilhada com o IBPAD fica em
+<https://github.com/fernandobmello/conjoint-eleicoes-2026> — o survey é idêntico;
+lá também vão o `export_96/` e o `export_cells.js`, que não são necessários para
+servir o site.
 
 ```
 ├── index.html              ← o survey inteiro (HTML + CSS + JS)
 ├── apps-script.gs          ← backend Google Sheets (instruções dentro do arquivo)
-├── assets/                 ← as 96 células como imagem + 12 fotos (21 MB)
+├── assets/                 ← 48 cards recortados + 12 fotos (5 MB)
 ├── extract_cards.py        ← recorta os 48 cards de notícia dos prints originais
 ├── extract_photos.py       ← recorta as 12 fotos usadas pelas variantes "post"
 ├── test_randomization.js   ← simula 5.000 respondentes e confere o balanceamento
-├── export_post_cards.js    ← gera os 48 PNGs das variantes "post" a partir do index.html
 (o workflow que publica no Pages fica na raiz deste repositório)
 ```
 
@@ -56,26 +57,42 @@ subir todos os arquivos mantendo a pasta `assets/` ao lado do `index.html`.
 - Se quiser mudar textos, grupos ou o pool de mensagens, tudo está nas constantes
   no topo do `<script>` do `index.html` — não é preciso mexer no resto do código.
 
+## Contadores de reação e encaminhamento
+
+Nos prints originais os contadores estavam gravados na imagem e variavam demais:
+o nível `high` ia de **4,2 mil a 21,3 mil** reações conforme a notícia, ou seja,
+a fonte acabava confundida com a magnitude da viralização.
+
+Hoje a faixa de contadores é **recortada fora do card** e desenhada em CSS, igual
+nas quatro fontes:
+
+| Nível | Faixa |
+|---|---|
+| `high` | 500 a 1.300 reações e encaminhamentos |
+| `low`  | 5 a 30 |
+
+Os números são sorteados **por célula, de forma determinística** (`countsFor()`,
+a partir do `profile_id`): cada uma das 96 células tem sempre o mesmo par, então
+o PNG exportado é idêntico ao que o respondente vê e a viralização continua um
+fator de dois níveis limpo. Para mudar as faixas, edite `COUNT_RANGE` no
+`index.html` e rode `node export_cells.js` de novo.
+
 ## As 96 células como imagem
 
-`assets/` contém um arquivo para cada uma das 96 células:
+`assets/` guarda os **insumos** que o survey usa: 48 cards recortados (sem os
+contadores) e 12 fotos. Nenhuma das quatro fontes é hoje uma imagem completa —
+todas terminam de ser montadas em CSS no navegador.
 
-| Fonte | Arquivos | Origem |
-|---|---|---|
-| `g1`, `no_source` | 48 `.jpg` | recortados dos prints originais |
-| `post`, `post_source` | 48 `.png` | rasterizados do próprio survey |
+As 96 células já renderizadas ficam em `export_96/`, no repositório do IBPAD —
+servem para portar o survey para outra plataforma, revisar e pré-registrar, e
+não são necessárias para servir o site.
 
-O survey **não usa** os 48 PNGs: ele desenha essas duas fontes em CSS, a partir
-da manchete e de `photo_<noticia>.jpg`. Os PNGs existem para portar o survey
-para outra plataforma (Qualtrics, LimeSurvey etc.), para revisão e para
-pré-registro.
-
-Para não haver divergência entre os dois, o `export_post_cards.js` **lê o CSS e
-a função `cardHTML()` de dentro do `index.html`** — não reescreve o desenho. Se
-mexer no visual dessas variantes, rode de novo:
+Para não haver divergência, o `export_cells.js` **lê o CSS e a função
+`cardHTML()` de dentro do `index.html`** — não reescreve o desenho. Depois de
+mexer no visual dos cards ou nas faixas de contadores, rode de novo:
 
 ```bash
-node export_post_cards.js     # precisa do Google Chrome e do ImageMagick
+node export_cells.js     # precisa do Google Chrome e do ImageMagick
 ```
 
 As imagens saem com 836 px de largura, já sobre o fundo do chat do WhatsApp —
@@ -229,15 +246,6 @@ o conteúdo passa a ter a mesma escala em todas as células. A moldura tem altur
 fixa (`.wa--task { height: 600px }`), então os dois lados de um par ocupam
 exatamente a mesma caixa; o card dentro dela varia de altura conforme o conteúdo,
 como num WhatsApp de verdade.
-
-### Contadores de viralização
-
-Nas variantes desenhadas (`post`, `post_source`) os contadores são fixos:
-`high` = 21,3 mil reações / 28,7 mil encaminhamentos, `low` = 21 / 9 (constante
-`COUNTS` no `index.html`). Nos cards `g1` e `no_source` os números estão gravados
-na imagem e variam de notícia para notícia — o contraste alto/baixo (milhares
-vs. dezenas) se mantém em todas, mas os valores exatos não são idênticos entre
-notícias. Para uniformizar seria preciso regerar esses 48 cards.
 
 ## Perguntas condicionais sobre partidos (tela 2)
 
