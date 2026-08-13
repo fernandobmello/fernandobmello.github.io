@@ -11,6 +11,12 @@
  * 5. Toda vez que editar este script, faça "Implantar → Gerenciar implantações →
  *    editar (lápis) → Versão: Nova versão → Implantar". A URL permanece a mesma.
  *
+ * ── MUDAR O QUESTIONÁRIO DEPOIS DE COMEÇAR A COLETA ────────────────
+ * Pode. As linhas são montadas pelo NOME da coluna, não pela posição: ao colar
+ * uma versão nova, as colunas que ainda não existem são acrescentadas ao fim do
+ * cabeçalho e as antigas ficam onde estão. Acrescentar, remover ou reordenar
+ * campos não desalinha o que já foi gravado, e não é preciso limpar nada.
+ *
  * ── O QUE ELE GRAVA ────────────────────────────────────────────────
  * Aba "respondents"   : 1 linha por respondente (formato wide)
  * Aba "conjoint_long" : 1 linha por TAREFA (10 por respondente) — pronto para
@@ -58,30 +64,21 @@ function doPost(e) {
 
     // ── respondents ──
     var r = data.respondent || {};
-    var respSheet = getSheet_(ss, SHEET_RESP, RESP_COLS);
-    respSheet.appendRow(RESP_COLS.map(function (c) {
-      if (c === 'timestamp') return now;
-      var v = r[c];
-      return (v === undefined || v === null) ? '' : v;
-    }));
+    var resp = sheetFor_(ss, SHEET_RESP, RESP_COLS);
+    resp.sheet.appendRow(rowFor_(resp.header, r, now));
 
     // ── conjoint_long ──
     var tasks = data.conjoint || [];
     if (tasks.length) {
-      var longSheet = getSheet_(ss, SHEET_LONG, LONG_COLS);
-      var rows = tasks.map(function (t) {
-        return LONG_COLS.map(function (c) {
-          if (c === 'timestamp') return now;
-          var v = t[c];
-          return (v === undefined || v === null) ? '' : v;
-        });
-      });
-      longSheet.getRange(longSheet.getLastRow() + 1, 1, rows.length, LONG_COLS.length).setValues(rows);
+      var lng = sheetFor_(ss, SHEET_LONG, LONG_COLS);
+      var rows = tasks.map(function (t) { return rowFor_(lng.header, t, now); });
+      lng.sheet.getRange(lng.sheet.getLastRow() + 1, 1, rows.length, lng.header.length)
+               .setValues(rows);
     }
 
     // ── raw ──
-    var rawSheet = getSheet_(ss, SHEET_RAW, ['timestamp', 'respondent_id', 'json']);
-    rawSheet.appendRow([now, r.respondent_id || '', JSON.stringify(data)]);
+    var raw = sheetFor_(ss, SHEET_RAW, ['timestamp', 'respondent_id', 'json']);
+    raw.sheet.appendRow([now, r.respondent_id || '', JSON.stringify(data)]);
 
     return json_({ status: 'ok', rows: tasks.length });
   } catch (err) {
@@ -91,20 +88,56 @@ function doPost(e) {
   }
 }
 
+/**
+ * Devolve a aba e o cabeçalho REAL dela, acrescentando ao fim as colunas que
+ * ainda não existem.
+ *
+ * É isto que permite mexer no questionário depois da coleta ter começado: as
+ * linhas são montadas pelo nome da coluna, não pela posição, então acrescentar,
+ * remover ou reordenar campos no script não desalinha o que já foi gravado.
+ * Basta colar a versão nova e reimplantar.
+ */
+function sheetFor_(ss, name, cols) {
+  var sh = ss.getSheetByName(name);
+  if (!sh) {
+    sh = ss.insertSheet(name);
+    sh.getRange(1, 1, 1, cols.length).setValues([cols]).setFontWeight('bold');
+    sh.setFrozenRows(1);
+    return { sheet: sh, header: cols.slice() };
+  }
+
+  var lastCol = sh.getLastColumn();
+  var header = lastCol ? sh.getRange(1, 1, 1, lastCol).getValues()[0]
+                           .map(function (v) { return String(v); }) : [];
+
+  if (!header.length || header.join('') === '') {          // aba existe mas vazia
+    sh.getRange(1, 1, 1, cols.length).setValues([cols]).setFontWeight('bold');
+    sh.setFrozenRows(1);
+    return { sheet: sh, header: cols.slice() };
+  }
+
+  var missing = cols.filter(function (c) { return header.indexOf(c) === -1; });
+  if (missing.length) {
+    sh.getRange(1, header.length + 1, 1, missing.length)
+      .setValues([missing]).setFontWeight('bold');
+    header = header.concat(missing);
+  }
+  return { sheet: sh, header: header };
+}
+
+/** Monta a linha na ordem do cabeçalho da planilha, campo a campo pelo nome. */
+function rowFor_(header, obj, now) {
+  return header.map(function (c) {
+    if (c === 'timestamp') return now;
+    var v = obj[c];
+    return (v === undefined || v === null) ? '' : v;
+  });
+}
+
 function doGet() {
   return json_({ status: 'ok', message: 'conjoint endpoint ativo' });
 }
 
-function getSheet_(ss, name, cols) {
-  var sh = ss.getSheetByName(name);
-  if (!sh) {
-    sh = ss.insertSheet(name);
-    sh.appendRow(cols);
-    sh.setFrozenRows(1);
-    sh.getRange(1, 1, 1, cols.length).setFontWeight('bold');
-  }
-  return sh;
-}
 
 function json_(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj))

@@ -17,6 +17,7 @@ servir o site.
 ├── extract_cards.py        ← recorta os 48 cards de notícia dos prints originais
 ├── extract_photos.py       ← recorta as 12 fotos usadas pelas variantes "post"
 ├── test_randomization.js   ← simula 5.000 respondentes e confere o balanceamento
+├── test_apps_script.js     ← testa a lógica de cabeçalho do backend
 (o workflow que publica no Pages fica na raiz deste repositório)
 ```
 
@@ -48,6 +49,21 @@ em `/conjoint/`.
 
 Como é um site estático, também funciona em qualquer outra hospedagem: basta
 subir todos os arquivos mantendo a pasta `assets/` ao lado do `index.html`.
+
+### Mudar o questionário depois que a coleta começar
+
+Pode, sem limpar nada. O `apps-script.gs` monta cada linha pelo **nome** da
+coluna, não pela posição: ao colar uma versão nova e reimplantar, as colunas
+inéditas são acrescentadas ao fim do cabeçalho e as antigas continuam onde
+estavam. Acrescentar, remover ou reordenar campos não desalinha as respostas já
+gravadas.
+
+O comportamento está coberto por `test_apps_script.js`, que roda a lógica de
+cabeçalho contra uma planilha simulada:
+
+```bash
+node test_apps_script.js
+```
 
 ### 4. Antes de ir a campo
 
