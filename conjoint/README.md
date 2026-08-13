@@ -57,6 +57,32 @@ subir todos os arquivos mantendo a pasta `assets/` ao lado do `index.html`.
 - Se quiser mudar textos, grupos ou o pool de mensagens, tudo está nas constantes
   no topo do `<script>` do `index.html` — não é preciso mexer no resto do código.
 
+## Escala de frequência de 7 pontos
+
+Três perguntas usam a mesma escala, definida uma única vez em `FREQ_SCALE` e
+montada por `renderFreqScale()` — frequência de compartilhamento no WhatsApp
+(tela 1) e os dois itens de exposição a conflito (tela 3):
+
+| Valor | Rótulo |
+|---|---|
+| 6 | Várias vezes por dia |
+| 5 | Uma vez por dia |
+| 4 | Várias vezes por semana |
+| 3 | Uma vez por semana |
+| 2 | Menos de uma vez por semana |
+| 1 | Muito raramente |
+| 0 | Nunca |
+
+Valor maior = mais frequente. Como as três perguntas leem da mesma constante,
+não há risco de uma ficar diferente das outras.
+
+O interesse por política também passou a ter 7 pontos (1 = nenhum interesse,
+7 = muito interesse), no mesmo formato de botões já usado na pergunta sobre
+importância de influenciar.
+
+As três perguntas de voluntariado (2018, 2022, 2026) são **Sim / Não**, sem
+"prefiro não responder": a opção tende a atrair muita gente e esvaziar a medida.
+
 ## Contadores de reação e encaminhamento
 
 Nos prints originais os contadores estavam gravados na imagem e variavam demais:
@@ -70,6 +96,11 @@ nas quatro fontes:
 |---|---|
 | `high` | 500 a 1.300 reações e encaminhamentos |
 | `low`  | 5 a 30 |
+
+A faixa fica presa ao conteúdo nas quatro fontes (dentro do card de notícia e
+dentro do balão do post), e o ícone de encaminhamento começa sempre na mesma
+posição — uma coluna fixa de 52%, não uma margem — para que a distância entre os
+emojis e o ícone não mude conforme o número tenha 1, 2 ou 4 dígitos.
 
 Os números são sorteados **por célula, de forma determinística** (`countsFor()`,
 a partir do `profile_id`): cada uma das 96 células tem sempre o mesmo par, então
@@ -303,9 +334,9 @@ console do navegador quando o `ENDPOINT` ainda não foi configurado (modo de tes
 | Tela | Conteúdo |
 |---|---|
 | 0 | Consentimento (recusa → tela 99, encerra) |
-| 1 | Interesse por política · importância de influenciar (0–7) · frequência de compartilhamento |
+| 1 | Interesse por política (1–7) · importância de influenciar (0–7) · frequência de compartilhamento (7 pontos) |
 | 2 | Partidos (+ 2 perguntas condicionais) · termômetros · bolsonarista vs. antipetista |
-| 3 | Consumo de notícias · plataformas · busca por política · exposição a conflito · evitação · voluntariado em 2018/2022/2026 |
+| 3 | Consumo de notícias · plataformas · busca por política · exposição a conflito (7 pontos) · evitação · voluntariado em 2018/2022/2026 |
 | 4–9 | Primeiro bloco: introdução + 5 tarefas |
 | 10–15 | Segundo bloco: introdução + 5 tarefas |
 | 16 | Gênero · idade · escolaridade · renda |

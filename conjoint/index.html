@@ -71,6 +71,9 @@
   .matrix-item { padding-top: 14px; margin-top: 14px; border-top: 1px solid var(--border); }
   .matrix-item:first-child { padding-top: 0; margin-top: 0; border-top: none; }
   .matrix-label { font-size: 0.92rem; line-height: 1.4; margin-bottom: 9px; }
+  .opts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)); gap: 7px; }
+  .opts-grid .opt { padding: 11px 12px; }
+  .opts-grid .opt span { font-size: 0.86rem; }
   .inline-opts { display: flex; gap: 7px; }
   .inline-opts .opt { flex: 1; padding: 10px 6px; justify-content: center; text-align: center; gap: 7px; }
   .inline-opts .opt span { flex: 0 1 auto; font-size: 0.84rem; }
@@ -224,9 +227,11 @@
                flex-direction: column; min-height: 0; }
   .wa__card { display: block; width: 100%; height: auto; min-height: 0;
               object-fit: contain; object-position: left top; }
-  .card-counts { display: flex; align-items: center; padding: 7px 11px 9px;
-                 font-size: 0.68rem; color: #111b21; white-space: nowrap; flex: none; }
-  .card-counts span:first-child { margin-right: 20%; }
+  /* grade de coluna fixa em vez de margem: assim a distância entre o grupo de
+     emojis e o ícone de encaminhar é idêntica nas 96 células */
+  .card-counts { display: grid; grid-template-columns: 52% 1fr; align-items: center;
+                 padding: 7px 11px 9px; font-size: 0.68rem; color: #111b21;
+                 white-space: nowrap; flex: none; }
 
   /* ── VARIANTES "POST" (fonte = post e post_source) ──
      Não são card de notícia: são uma mensagem de texto encaminhada, com a foto
@@ -244,9 +249,7 @@
   .post-txt { font-size:.72rem; line-height:1.35; color:#111b21; }
   .post-cta { font-size:.68rem; line-height:1.35; color:#111b21; }
   .post-photo { display:block; width:100%; height:auto; border-radius:4px; min-height:0; object-fit:cover; }
-  .post-pills { display:flex; gap:8px; }
-  .post-pills span { background:#fff; border-radius:20px; padding:3px 9px; font-size:.65rem;
-                     color:#111b21; box-shadow:0 1px 1px rgba(0,0,0,.12); white-space:nowrap; }
+  .post-bubble .card-counts { padding: 1px 0 0; }
   .conjoint-card .choice-label {
     position: relative; padding: 12px 44px; text-align: center; font-size: 0.85rem;
     font-weight: 600; color: var(--muted); background: #f8fafc; border-top: 1px solid var(--border);
@@ -273,7 +276,7 @@
   #lightbox-content .post-head .name { font-size: .95rem; }
   #lightbox-content .post-head .kind { font-size: .8rem; }
   #lightbox-content .post-head .flag { width: 34px; height: 34px; font-size: 1.1rem; }
-  #lightbox-content .post-pills span { font-size: .85rem; padding: 5px 12px; }
+  #lightbox-content .card-counts { font-size: .85rem; }
   #lightbox .close { position: absolute; top: 14px; right: 18px; color: #fff; font-size: 2rem;
                      background: none; border: none; cursor: pointer; line-height: 1; }
 
@@ -380,10 +383,17 @@
     <div class="card">
       <div class="question-block">
         <div class="question-text">Qual é o seu nível de interesse por política?</div>
-        <div class="options" id="q-interesse">
-          <label class="opt"><input type="radio" name="interesse" value="1"><span>Nenhum interesse</span></label>
-          <label class="opt"><input type="radio" name="interesse" value="2"><span>Pouco interesse</span></label>
-          <label class="opt"><input type="radio" name="interesse" value="3"><span>Muito interesse</span></label>
+        <div class="scale-wrap">
+          <div class="scale-labels"><span>1 — Nenhum interesse</span><span>7 — Muito interesse</span></div>
+          <div class="scale-buttons" id="scale-interesse">
+            <button type="button" class="scale-btn" onclick="setScale('interesse',1,this)">1</button>
+            <button type="button" class="scale-btn" onclick="setScale('interesse',2,this)">2</button>
+            <button type="button" class="scale-btn" onclick="setScale('interesse',3,this)">3</button>
+            <button type="button" class="scale-btn" onclick="setScale('interesse',4,this)">4</button>
+            <button type="button" class="scale-btn" onclick="setScale('interesse',5,this)">5</button>
+            <button type="button" class="scale-btn" onclick="setScale('interesse',6,this)">6</button>
+            <button type="button" class="scale-btn" onclick="setScale('interesse',7,this)">7</button>
+          </div>
         </div>
       </div>
 
@@ -405,13 +415,8 @@
       </div>
 
       <div class="question-block">
-        <div class="question-text">Em uma semana típica, com que frequência você compartilha conteúdo político no WhatsApp?</div>
-        <div class="options" id="q-compartilha">
-          <label class="opt"><input type="radio" name="compartilha" value="1"><span>Nunca</span></label>
-          <label class="opt"><input type="radio" name="compartilha" value="2"><span>Às vezes</span></label>
-          <label class="opt"><input type="radio" name="compartilha" value="3"><span>Frequentemente</span></label>
-          <label class="opt"><input type="radio" name="compartilha" value="4"><span>Sempre</span></label>
-        </div>
+        <div class="question-text">Com que frequência você compartilha conteúdo político no WhatsApp?</div>
+        <div class="opts-grid" id="q-compartilha"><!-- preenchido por renderFreqScale() --></div>
       </div>
 
       <div class="alert" id="alert-s1">Por favor, responda todas as perguntas desta página.</div>
@@ -538,21 +543,11 @@
         <div class="matrix" id="q-exposicao">
           <div class="matrix-item">
             <div class="matrix-label">Vi mensagens políticas de ódio ou ofensivas.</div>
-            <div class="inline-opts">
-              <label class="opt"><input type="radio" name="exp_odio" value="0"><span>Nunca</span></label>
-              <label class="opt"><input type="radio" name="exp_odio" value="1"><span>Uma vez</span></label>
-              <label class="opt"><input type="radio" name="exp_odio" value="2"><span>Algumas vezes</span></label>
-              <label class="opt"><input type="radio" name="exp_odio" value="3"><span>Frequentemente</span></label>
-            </div>
+            <div class="opts-grid" id="q-exp_odio"><!-- preenchido por renderFreqScale() --></div>
           </div>
           <div class="matrix-item">
             <div class="matrix-label">Vi pessoas discutindo ou brigando por causa de política.</div>
-            <div class="inline-opts">
-              <label class="opt"><input type="radio" name="exp_briga" value="0"><span>Nunca</span></label>
-              <label class="opt"><input type="radio" name="exp_briga" value="1"><span>Uma vez</span></label>
-              <label class="opt"><input type="radio" name="exp_briga" value="2"><span>Algumas vezes</span></label>
-              <label class="opt"><input type="radio" name="exp_briga" value="3"><span>Frequentemente</span></label>
-            </div>
+            <div class="opts-grid" id="q-exp_briga"><!-- preenchido por renderFreqScale() --></div>
           </div>
         </div>
       </div>
@@ -592,7 +587,6 @@
             <div class="inline-opts">
               <label class="opt"><input type="radio" name="voluntario_2018" value="sim"><span>Sim</span></label>
               <label class="opt"><input type="radio" name="voluntario_2018" value="nao"><span>Não</span></label>
-              <label class="opt"><input type="radio" name="voluntario_2018" value="nr"><span>Prefiro não responder</span></label>
             </div>
           </div>
           <div class="matrix-item">
@@ -600,7 +594,6 @@
             <div class="inline-opts">
               <label class="opt"><input type="radio" name="voluntario_2022" value="sim"><span>Sim</span></label>
               <label class="opt"><input type="radio" name="voluntario_2022" value="nao"><span>Não</span></label>
-              <label class="opt"><input type="radio" name="voluntario_2022" value="nr"><span>Prefiro não responder</span></label>
             </div>
           </div>
           <div class="matrix-item">
@@ -608,7 +601,6 @@
             <div class="inline-opts">
               <label class="opt"><input type="radio" name="voluntario_2026" value="sim"><span>Sim</span></label>
               <label class="opt"><input type="radio" name="voluntario_2026" value="nao"><span>Não</span></label>
-              <label class="opt"><input type="radio" name="voluntario_2026" value="nr"><span>Prefiro não responder</span></label>
             </div>
           </div>
         </div>
@@ -874,6 +866,25 @@ const SENDERS = [
 ];
 const CTX_COUNT = 3;        // mensagens de contexto acima do card (bloco B)
 
+// Escala de frequência de 7 pontos, usada em três perguntas da tela 1 e da
+// tela 3. Valor maior = mais frequente.
+const FREQ_SCALE = [
+  { v: 6, label: 'Várias vezes por dia' },
+  { v: 5, label: 'Uma vez por dia' },
+  { v: 4, label: 'Várias vezes por semana' },
+  { v: 3, label: 'Uma vez por semana' },
+  { v: 2, label: 'Menos de uma vez por semana' },
+  { v: 1, label: 'Muito raramente' },
+  { v: 0, label: 'Nunca' }
+];
+function renderFreqScale(name) {
+  const c = document.getElementById('q-' + name);
+  if (!c) return;
+  c.innerHTML = FREQ_SCALE.map(o =>
+    `<label class="opt"><input type="radio" name="${name}" value="${o.v}"><span>${o.label}</span></label>`
+  ).join('');
+}
+
 // ── Bloco A: duas mensagens fixas, ordem definida pela valência do card ──
 // A mensagem que "responde" ao card vem por último, colada nele:
 //   card pró-Flávio  → Fora Lula e PT!  /  Flávio Bolsonaro, Presidente!
@@ -1121,9 +1132,7 @@ function cardHTML(p, alt) {
         <div class="post-txt">${p.headline}</div>
         <div class="post-cta">${POST_CTA[0]}<br>${POST_CTA[1]}</div>
         <img class="post-photo" src="${p.photo}" alt="" loading="lazy">
-      </div>
-      <div class="post-pills">
-        <span>👍😮🙏 ${c.react}</span><span>↗ ${c.fwd}</span>
+        <div class="card-counts"><span>👍😮🙏 ${c.react}</span><span>↗ ${c.fwd}</span></div>
       </div>
     </div>`;
 }
@@ -1419,15 +1428,16 @@ function startSurvey() {
 
 function validateScreen1() {
   const alertEl = document.getElementById('alert-s1');
-  const missing = ['interesse','compartilha'].filter(n => radioVal(n) === null);
-  if (missing.length || responses.influencia === undefined) {
+  const faltaEscala = ['interesse', 'influencia'].filter(k => responses[k] === undefined);
+  const faltaRadio = ['compartilha'].filter(n => radioVal(n) === null);
+  if (faltaEscala.length || faltaRadio.length) {
     alertEl.classList.add('show');
-    const firstId = missing.length ? 'q-' + missing[0] : 'scale-influencia';
-    document.getElementById(firstId)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const el = faltaEscala.length ? document.getElementById('scale-' + faltaEscala[0])
+                                  : document.getElementById('q-' + faltaRadio[0]);
+    el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     return;
   }
   alertEl.classList.remove('show');
-  responses.interesse = radioVal('interesse');
   responses.compartilha = radioVal('compartilha');
   goTo(2);
 }
@@ -1615,6 +1625,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   renderPartyOptions('partido_gosta');
   renderPartyOptions('partido_menos');
+  ['compartilha', 'exp_odio', 'exp_briga'].forEach(renderFreqScale);
 
   document.addEventListener('change', e => {
     if (e.target.type === 'radio') {
