@@ -38,7 +38,7 @@ var RESP_COLS = [
   'silenciou','saiu_grupo','evitou',
   'voluntario_2018','voluntario_2022','voluntario_2026',
   'genero','idade','escolaridade','renda',
-  'raca','estado','religiao','status',
+  'raca','estado','religiao','motivos',
   'context_A','context_B',
   'mc_A_first','mc_A_attempts','mc_A_correct1st',
   'mc_B_first','mc_B_attempts','mc_B_correct1st',

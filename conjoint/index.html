@@ -662,8 +662,29 @@
 
   <!-- ══════════ SCREENS 4–17 — CONJOINTS (gerados dinamicamente) ══════════ -->
 
-  <!-- ══════════ SCREEN 18 — DEMOGRAFIA 1 ══════════ -->
+  <!-- ══════════ SCREEN 18 — MOTIVOS DAS ESCOLHAS ══════════ -->
   <div class="screen" id="screen-18">
+    <div class="card">
+      <div class="question-block">
+        <div class="question-text">Pense nas escolhas que você fez na tarefa de compartilhamento e indique quais das opções abaixo mais se aproximam dos motivos das suas escolhas.</div>
+        <div class="question-subtext">Você pode selecionar mais de uma opção.</div>
+        <div class="options" id="q-motivos">
+          <label class="opt"><input type="checkbox" name="motivos" value="ideologia"><span>Escolhi mensagens que considero alinhadas às minhas posições ideológicas.</span></label>
+          <label class="opt"><input type="checkbox" name="motivos" value="agradar_grupo"><span>Escolhi mensagens que acredito que outros membros do grupo vão gostar.</span></label>
+          <label class="opt"><input type="checkbox" name="motivos" value="informar"><span>Escolhi mensagens que acredito que podem ajudar os membros do grupo a tomar decisões mais informadas na próxima eleição.</span></label>
+          <label class="opt"><input type="checkbox" name="motivos" value="apoio_bolsonaro"><span>Escolhi mensagens que acredito que podem ajudar a aumentar ao máximo o apoio a Bolsonaro.</span></label>
+          <label class="opt"><input type="checkbox" name="motivos" value="recompartilhar"><span>Escolhi mensagens que acredito que provavelmente serão compartilhadas novamente.</span></label>
+        </div>
+      </div>
+      <div class="alert" id="alert-motivos">Por favor, selecione pelo menos uma opção.</div>
+      <div class="nav-buttons">
+        <button class="btn btn-primary" onclick="validateMotivos()">Próximo →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SCREEN 19 — DEMOGRAFIA 1 ══════════ -->
+  <div class="screen" id="screen-19">
     <div class="card">
       <div class="question-block">
         <div class="question-text">Qual é o seu gênero?</div>
@@ -706,8 +727,8 @@
     </div>
   </div>
 
-  <!-- ══════════ SCREEN 19 — DEMOGRAFIA 2 ══════════ -->
-  <div class="screen" id="screen-19">
+  <!-- ══════════ SCREEN 20 — DEMOGRAFIA 2 ══════════ -->
+  <div class="screen" id="screen-20">
     <div class="card">
       <div class="question-block">
         <div class="question-text">Qual é a sua cor ou raça?</div>
@@ -739,27 +760,16 @@
         </div>
       </div>
 
-      <div class="question-block">
-        <div class="question-text">Ao longo dos últimos 25 anos, alguns grupos ganharam importância na sociedade, enquanto outros perderam importância. Pensando nos últimos 25 anos, você diria que você e pessoas como você:</div>
-        <div class="options" id="q-status">
-          <label class="opt"><input type="radio" name="status" value="ganharam_muita"><span>Ganharam muita importância na sociedade</span></label>
-          <label class="opt"><input type="radio" name="status" value="ganharam_alguma"><span>Ganharam alguma importância na sociedade</span></label>
-          <label class="opt"><input type="radio" name="status" value="nem_nem"><span>Nem ganharam nem perderam importância na sociedade</span></label>
-          <label class="opt"><input type="radio" name="status" value="perderam_alguma"><span>Perderam alguma importância na sociedade</span></label>
-          <label class="opt"><input type="radio" name="status" value="perderam_muita"><span>Perderam muita importância na sociedade</span></label>
-        </div>
-      </div>
-
       <div class="alert" id="alert-demo2">Por favor, responda todas as perguntas desta página.</div>
       <div class="nav-buttons">
-        <button class="btn btn-secondary" onclick="goTo(18)">← Voltar</button>
+        <button class="btn btn-secondary" onclick="goTo(19)">← Voltar</button>
         <button class="btn btn-primary btn-lg" onclick="validateDemo2()">Enviar respostas →</button>
       </div>
     </div>
   </div>
 
-  <!-- ══════════ SCREEN 20 — AGRADECIMENTO ══════════ -->
-  <div class="screen" id="screen-20">
+  <!-- ══════════ SCREEN 21 — AGRADECIMENTO ══════════ -->
+  <div class="screen" id="screen-21">
     <div class="card" style="text-align:center;">
       <div class="thanks-icon">🎉</div>
       <div class="thanks-title">Obrigado pela sua participação.</div>
@@ -997,11 +1007,11 @@ const TASK_PROMPT = 'Quais das duas mensagens abaixo você prefere compartilhar 
 const TASK_PROMPT_SUB = 'Escolha uma obrigatoriamente.';
 
 // ── LAYOUT DE TELAS ──────────────────────────────────────────────────
-// 0 consentimento · 1–3 pré-tratamento · 4–17 conjoints (gerados) · 18–19 demografia · 20 fim
+// 0 consentimento · 1–3 pré-tratamento · 4–17 conjoints (gerados) · 18 motivos · 19–20 demografia · 21 fim
 // Cada bloco gera 7 telas: introdução, checagem de manipulação e 5 tarefas.
 const CONJ_ANCHOR   = 18;   // as telas geradas são inseridas ANTES desta
 const CONJ_START    = 4;
-const TOTAL_SCREENS = 21;
+const TOTAL_SCREENS = 22;
 const NO_CONSENT_SCREEN = 99;
 
 // Partidos: a ordem é sorteada por respondente. "Outro" fica sempre por último.
@@ -1608,6 +1618,19 @@ function validateScreen3() {
   goTo(4);
 }
 
+function validateMotivos() {
+  const alertEl = document.getElementById('alert-motivos');
+  const escolhas = checkVals('motivos');
+  if (!escolhas.length) {
+    alertEl.classList.add('show');
+    document.getElementById('q-motivos').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  alertEl.classList.remove('show');
+  responses.motivos = escolhas.join('|');
+  goTo(19);
+}
+
 function validateDemo1() {
   const alertEl = document.getElementById('alert-demo1');
   const names = ['genero','escolaridade','renda'];
@@ -1627,12 +1650,12 @@ function validateDemo1() {
   alertEl.classList.remove('show');
   names.forEach(n => { responses[n] = radioVal(n); });
   responses.idade = idade;
-  goTo(19);
+  goTo(20);
 }
 
 function validateDemo2() {
   const alertEl = document.getElementById('alert-demo2');
-  const names = ['raca','religiao','status'];
+  const names = ['raca','religiao'];
   const missing = names.filter(n => radioVal(n) === null);
   const estado = document.getElementById('estado').value;
   if (missing.length || !estado) {
@@ -1645,7 +1668,7 @@ function validateDemo2() {
   alertEl.classList.remove('show');
   names.forEach(n => { responses[n] = radioVal(n); });
   responses.estado = estado;
-  goTo(20);
+  goTo(21);
   submitResponses();
 }
 
@@ -1765,7 +1788,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
 
   window.addEventListener('beforeunload', e => {
-    if (currentScreen > 0 && currentScreen < 20) { e.preventDefault(); e.returnValue = ''; }
+    if (currentScreen > 0 && currentScreen < 21) { e.preventDefault(); e.returnValue = ''; }
   });
 
   updateProgress();

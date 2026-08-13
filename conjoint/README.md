@@ -340,6 +340,20 @@ fixa (`.wa--task { height: 600px }`), então os dois lados de um par ocupam
 exatamente a mesma caixa; o card dentro dela varia de altura conforme o conteúdo,
 como num WhatsApp de verdade.
 
+## Motivos das escolhas (tela 18)
+
+Logo depois do segundo bloco do conjoint, antes da demografia, o respondente
+indica o que guiou suas escolhas. É múltipla escolha (`motivos`, gravado como
+lista separada por `|`), com pelo menos uma marcação obrigatória:
+
+`ideologia` · `agradar_grupo` · `informar` · `apoio_bolsonaro` · `recompartilhar`
+
+A ordem das cinco alternativas **não** é sorteada — se quiser sortear, o mesmo
+padrão de `renderPartyOptions()` resolve.
+
+A pergunta sobre ganho/perda de importância na sociedade nos últimos 25 anos foi
+retirada; a coluna `status` não é mais enviada.
+
 ## Perguntas condicionais sobre partidos (tela 2)
 
 Quem responde **Sim** para "existe algum partido que representa a sua forma de
@@ -401,9 +415,10 @@ console do navegador quando o `ENDPOINT` ainda não foi configurado (modo de tes
 | 3 | Consumo de notícias · plataformas · busca por política · exposição a conflito (7 pontos) · evitação · voluntariado em 2018/2022/2026 |
 | 4–10 | Primeiro bloco: introdução + checagem + 5 tarefas |
 | 11–17 | Segundo bloco: introdução + checagem + 5 tarefas |
-| 18 | Gênero · idade · escolaridade · renda |
-| 19 | Cor/raça · estado · religiosidade · perda de status |
-| 20 | Agradecimento + envio |
+| 18 | Motivos das escolhas no conjoint (múltipla escolha) |
+| 19 | Gênero · idade · escolaridade · renda |
+| 20 | Cor/raça · estado · religiosidade |
+| 21 | Agradecimento + envio |
 
 As telas 4–17 são geradas por JavaScript no momento do consentimento, já na ordem
 sorteada. Todas as perguntas são obrigatórias e validadas antes de avançar; não há
