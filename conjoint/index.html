@@ -668,13 +668,7 @@
       <div class="question-block">
         <div class="question-text">Pense nas escolhas que você fez na tarefa de compartilhamento e indique quais das opções abaixo mais se aproximam dos motivos das suas escolhas.</div>
         <div class="question-subtext">Você pode selecionar mais de uma opção.</div>
-        <div class="options" id="q-motivos">
-          <label class="opt"><input type="checkbox" name="motivos" value="ideologia"><span>Escolhi mensagens que considero alinhadas às minhas posições ideológicas.</span></label>
-          <label class="opt"><input type="checkbox" name="motivos" value="agradar_grupo"><span>Escolhi mensagens que acredito que outros membros do grupo vão gostar.</span></label>
-          <label class="opt"><input type="checkbox" name="motivos" value="informar"><span>Escolhi mensagens que acredito que podem ajudar os membros do grupo a tomar decisões mais informadas na próxima eleição.</span></label>
-          <label class="opt"><input type="checkbox" name="motivos" value="apoio_bolsonaro"><span>Escolhi mensagens que acredito que podem ajudar a aumentar ao máximo o apoio a Bolsonaro.</span></label>
-          <label class="opt"><input type="checkbox" name="motivos" value="recompartilhar"><span>Escolhi mensagens que acredito que provavelmente serão compartilhadas novamente.</span></label>
-        </div>
+        <div class="options" id="q-motivos"><!-- preenchido por renderMotivos() --></div>
       </div>
       <div class="alert" id="alert-motivos">Por favor, selecione pelo menos uma opção.</div>
       <div class="nav-buttons">
@@ -933,6 +927,25 @@ const FREQ_SCALE = [
   { v: 1, label: 'Muito raramente' },
   { v: 0, label: 'Nunca' }
 ];
+// Motivos declarados para as escolhas do conjoint (tela 18). A ordem é
+// sorteada por respondente e gravada em `motivos_order`.
+const MOTIVO_OPTIONS = [
+  { key:'ideologia',       label:'Escolhi mensagens que considero alinhadas às minhas posições ideológicas.' },
+  { key:'agradar_grupo',   label:'Escolhi mensagens que acredito que outros membros do grupo vão gostar.' },
+  { key:'informar',        label:'Escolhi mensagens que acredito que podem ajudar os membros do grupo a tomar decisões mais informadas na próxima eleição.' },
+  { key:'apoio_bolsonaro', label:'Escolhi mensagens que acredito que podem ajudar a aumentar ao máximo o apoio a Bolsonaro.' },
+  { key:'foco_pt',         label:'Escolhi mensagens que focam no PT ou em Lula.' },
+  { key:'recompartilhar',  label:'Escolhi mensagens que acredito que provavelmente serão compartilhadas novamente.' }
+];
+let MOTIVO_ORDER = null;
+
+function renderMotivos() {
+  MOTIVO_ORDER = shuffle(MOTIVO_OPTIONS);
+  document.getElementById('q-motivos').innerHTML = MOTIVO_ORDER.map(o =>
+    `<label class="opt"><input type="checkbox" name="motivos" value="${o.key}"><span>${o.label}</span></label>`
+  ).join('');
+}
+
 function renderFreqScale(name) {
   const c = document.getElementById('q-' + name);
   if (!c) return;
@@ -1628,6 +1641,7 @@ function validateMotivos() {
   }
   alertEl.classList.remove('show');
   responses.motivos = escolhas.join('|');
+  responses.motivos_order = MOTIVO_ORDER.map(o => o.key).join('|');
   goTo(19);
 }
 
@@ -1774,6 +1788,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderPartyOptions('partido_gosta');
   renderPartyOptions('partido_menos');
   ['compartilha', 'exp_odio', 'exp_briga'].forEach(renderFreqScale);
+  renderMotivos();
 
   document.addEventListener('change', e => {
     if (e.target.type === 'radio') {

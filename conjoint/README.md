@@ -346,10 +346,17 @@ Logo depois do segundo bloco do conjoint, antes da demografia, o respondente
 indica o que guiou suas escolhas. É múltipla escolha (`motivos`, gravado como
 lista separada por `|`), com pelo menos uma marcação obrigatória:
 
-`ideologia` · `agradar_grupo` · `informar` · `apoio_bolsonaro` · `recompartilhar`
+| Valor | Motivo |
+|---|---|
+| `ideologia` | alinhamento com as próprias posições |
+| `agradar_grupo` | agradar os outros membros |
+| `informar` | ajudar o grupo a decidir melhor |
+| `apoio_bolsonaro` | maximizar o apoio a Bolsonaro |
+| `foco_pt` | mensagens que focam no PT ou em Lula |
+| `recompartilhar` | probabilidade de ser compartilhada de novo |
 
-A ordem das cinco alternativas **não** é sorteada — se quiser sortear, o mesmo
-padrão de `renderPartyOptions()` resolve.
+A ordem das seis alternativas é **sorteada por respondente** (`MOTIVO_OPTIONS` +
+`renderMotivos()`) e a ordem exibida fica em `motivos_order`.
 
 A pergunta sobre ganho/perda de importância na sociedade nos últimos 25 anos foi
 retirada; a coluna `status` não é mais enviada.
