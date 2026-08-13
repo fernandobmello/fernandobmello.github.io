@@ -208,11 +208,12 @@
   .task-dot.done { background: var(--success); }
   /* colunas de largura idêntica; minmax(0,·) impede que uma imagem estoure a coluna */
   .conjoint-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
-                   gap: 14px; margin-bottom: 16px; align-items: start; }
+                   gap: 14px; margin-bottom: 16px; align-items: stretch; }
 
   .conjoint-card {
     border: 3px solid var(--border); border-radius: var(--radius); overflow: hidden;
     cursor: pointer; transition: all 0.18s; background: #fff; position: relative;
+    display: flex; flex-direction: column;
   }
   .conjoint-card:hover { border-color: var(--accent); }
   .conjoint-card.selected { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(26,86,219,0.15); }
@@ -220,7 +221,12 @@
      A imagem é só o card de notícia; o grupo (nome + mensagens) é desenhado aqui,
      então muda conforme o bloco. Altura fixa: os dois lados de um par ocupam
      exatamente a mesma caixa, independentemente do tamanho do card. */
-  .wa--task { height: 600px; }
+  /* Sem altura fixa: os dois lados de um par são células da MESMA linha do grid
+     e esticam juntos, então ficam exatamente do mesmo tamanho — que é o que a
+     comparação exige — mas acompanham o conteúdo. Uma altura fixa global teria
+     de caber a célula mais alta das 96 e deixaria ~300px de conversa vazia nos
+     pares curtos. */
+  .wa--task { height: auto; flex: 1; min-height: 0; }  /* anula o clamp de .wa */
   .wa--task .wa__bar { padding: 10px 10px; }
   .wa--task .wa__avatar { width: 30px; height: 30px; font-size: 0.9rem; }
   .wa--task .wa__name { font-size: 0.82rem; }
@@ -346,7 +352,6 @@
      a moldura encolhe junto; a lupa amplia qualquer um dos dois. */
   @media (max-width: 620px) {
     .conjoint-pair { gap: 7px; }
-    .wa--task { height: 400px; }
     .wa--task .wa__bar { padding: 6px 5px; gap: 4px; }
     .wa--task .wa__back { font-size: .8rem; }
     .wa--task .wa__avatar { width: 18px; height: 18px; font-size: .55rem; }

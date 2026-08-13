@@ -107,6 +107,13 @@ decidir. Abaixo de 620px a moldura inteira encolhe junto (cabeçalho, balões,
 barra de digitação, contadores), então as duas continuam do mesmo tamanho e na
 mesma escala. A lupa amplia qualquer uma das duas.
 
+A moldura **não tem altura fixa**: os dois lados são células da mesma linha do
+grid e esticam juntos, ficando exatamente do mesmo tamanho — que é o que a
+comparação exige — mas acompanhando o conteúdo do par. Uma altura fixa global
+teria de caber a célula mais alta das 96 e sobrava como conversa vazia no topo
+dos pares curtos (~300px no desktop, ~150px no celular). Agora a folga no topo
+fica em 10–40px e a tarefa inteira cabe numa tela de celular sem rolar.
+
 Isso também corrige uma assimetria: como `g1` e `no_source` são imagem e
 `post`/`post_source` são desenhados em CSS, sem esse ajuste os primeiros
 encolhiam com a coluna e os segundos mantinham a fonte original — as duas
