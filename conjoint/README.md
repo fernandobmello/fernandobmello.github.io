@@ -76,9 +76,9 @@ montada por `renderFreqScale()` — frequência de compartilhamento no WhatsApp
 Valor maior = mais frequente. Como as três perguntas leem da mesma constante,
 não há risco de uma ficar diferente das outras.
 
-O interesse por política também passou a ter 7 pontos (1 = nenhum interesse,
-7 = muito interesse), no mesmo formato de botões já usado na pergunta sobre
-importância de influenciar.
+As duas perguntas em formato de botões vão de **1 a 7**: interesse por política
+(1 = nenhum interesse, 7 = muito interesse) e importância de influenciar a
+opinião dos outros (1 = nada importante, 7 = extremamente importante).
 
 As três perguntas de voluntariado (2018, 2022, 2026) são **Sim / Não**, sem
 "prefiro não responder": a opção tende a atrair muita gente e esvaziar a medida.
@@ -334,7 +334,7 @@ console do navegador quando o `ENDPOINT` ainda não foi configurado (modo de tes
 | Tela | Conteúdo |
 |---|---|
 | 0 | Consentimento (recusa → tela 99, encerra) |
-| 1 | Interesse por política (1–7) · importância de influenciar (0–7) · frequência de compartilhamento (7 pontos) |
+| 1 | Interesse por política (1–7) · importância de influenciar (1–7) · frequência de compartilhamento (7 pontos) |
 | 2 | Partidos (+ 2 perguntas condicionais) · termômetros · bolsonarista vs. antipetista |
 | 3 | Consumo de notícias · plataformas · busca por política · exposição a conflito (7 pontos) · evitação · voluntariado em 2018/2022/2026 |
 | 4–9 | Primeiro bloco: introdução + 5 tarefas |
