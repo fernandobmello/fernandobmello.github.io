@@ -462,7 +462,7 @@
 
       <div class="question-block">
         <div class="question-text">Com que frequência você compartilha conteúdo político no WhatsApp?</div>
-        <div class="opts-grid" id="q-compartilha"><!-- preenchido por renderFreqScale() --></div>
+        <div class="opts-grid" id="q-compartilha"><!-- preenchido por renderScale() --></div>
       </div>
 
       <div class="alert" id="alert-s1">Por favor, responda todas as perguntas desta página.</div>
@@ -589,11 +589,11 @@
         <div class="matrix" id="q-exposicao">
           <div class="matrix-item">
             <div class="matrix-label">Vi mensagens políticas de ódio ou ofensivas.</div>
-            <div class="opts-grid" id="q-exp_odio"><!-- preenchido por renderFreqScale() --></div>
+            <div class="inline-opts" id="q-exp_odio"><!-- preenchido por renderScale() --></div>
           </div>
           <div class="matrix-item">
             <div class="matrix-label">Vi pessoas discutindo ou brigando por causa de política.</div>
-            <div class="opts-grid" id="q-exp_briga"><!-- preenchido por renderFreqScale() --></div>
+            <div class="inline-opts" id="q-exp_briga"><!-- preenchido por renderScale() --></div>
           </div>
         </div>
       </div>
@@ -916,8 +916,8 @@ const SENDERS = [
 ];
 const CTX_COUNT = 3;        // mensagens de contexto acima do card (bloco B)
 
-// Escala de frequência de 7 pontos, usada em três perguntas da tela 1 e da
-// tela 3. Valor maior = mais frequente.
+// Escala de frequência de 7 pontos — usada na frequência de compartilhamento
+// no WhatsApp (tela 1). Valor maior = mais frequente.
 const FREQ_SCALE = [
   { v: 6, label: 'Várias vezes por dia' },
   { v: 5, label: 'Uma vez por dia' },
@@ -946,10 +946,18 @@ function renderMotivos() {
   ).join('');
 }
 
-function renderFreqScale(name) {
+// Escala de 4 pontos dos dois itens de exposição a conflito (tela 3).
+const EXP_SCALE = [
+  { v: 0, label: 'Nunca' },
+  { v: 1, label: 'Uma vez' },
+  { v: 2, label: 'Algumas vezes' },
+  { v: 3, label: 'Frequentemente' }
+];
+
+function renderScale(name, scale) {
   const c = document.getElementById('q-' + name);
   if (!c) return;
-  c.innerHTML = FREQ_SCALE.map(o =>
+  c.innerHTML = scale.map(o =>
     `<label class="opt"><input type="radio" name="${name}" value="${o.v}"><span>${o.label}</span></label>`
   ).join('');
 }
@@ -1787,7 +1795,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   renderPartyOptions('partido_gosta');
   renderPartyOptions('partido_menos');
-  ['compartilha', 'exp_odio', 'exp_briga'].forEach(renderFreqScale);
+  renderScale('compartilha', FREQ_SCALE);
+  ['exp_odio', 'exp_briga'].forEach(n => renderScale(n, EXP_SCALE));
   renderMotivos();
 
   document.addEventListener('change', e => {

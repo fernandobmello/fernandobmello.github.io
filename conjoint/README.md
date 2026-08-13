@@ -73,11 +73,12 @@ node test_apps_script.js
 - Se quiser mudar textos, grupos ou o pool de mensagens, tudo está nas constantes
   no topo do `<script>` do `index.html` — não é preciso mexer no resto do código.
 
-## Escala de frequência de 7 pontos
+## Escalas de frequência
 
-Três perguntas usam a mesma escala, definida uma única vez em `FREQ_SCALE` e
-montada por `renderFreqScale()` — frequência de compartilhamento no WhatsApp
-(tela 1) e os dois itens de exposição a conflito (tela 3):
+Duas escalas diferentes, montadas por `renderScale(nome, escala)`.
+
+**`FREQ_SCALE`, 7 pontos** — só na frequência de compartilhamento no WhatsApp
+(tela 1):
 
 | Valor | Rótulo |
 |---|---|
@@ -89,8 +90,16 @@ montada por `renderFreqScale()` — frequência de compartilhamento no WhatsApp
 | 1 | Muito raramente |
 | 0 | Nunca |
 
-Valor maior = mais frequente. Como as três perguntas leem da mesma constante,
-não há risco de uma ficar diferente das outras.
+**`EXP_SCALE`, 4 pontos** — nos dois itens de exposição a conflito (tela 3):
+
+| Valor | Rótulo |
+|---|---|
+| 0 | Nunca |
+| 1 | Uma vez |
+| 2 | Algumas vezes |
+| 3 | Frequentemente |
+
+Nas duas, valor maior = mais frequente.
 
 As duas perguntas em formato de botões vão de **1 a 7**: interesse por política
 (1 = nenhum interesse, 7 = muito interesse) e importância de influenciar a
@@ -419,7 +428,7 @@ console do navegador quando o `ENDPOINT` ainda não foi configurado (modo de tes
 | 0 | Consentimento (recusa → tela 99, encerra) |
 | 1 | Interesse por política (1–7) · importância de influenciar (1–7) · frequência de compartilhamento (7 pontos) |
 | 2 | Partidos (+ 2 perguntas condicionais) · termômetros · bolsonarista vs. antipetista |
-| 3 | Consumo de notícias · plataformas · busca por política · exposição a conflito (7 pontos) · evitação · voluntariado em 2018/2022/2026 |
+| 3 | Consumo de notícias · plataformas · busca por política · exposição a conflito (0–3) · evitação · voluntariado em 2018/2022/2026 |
 | 4–10 | Primeiro bloco: introdução + checagem + 5 tarefas |
 | 11–17 | Segundo bloco: introdução + checagem + 5 tarefas |
 | 18 | Motivos das escolhas no conjoint (múltipla escolha) |
