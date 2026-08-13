@@ -99,6 +99,22 @@ opinião dos outros (1 = nada importante, 7 = extremamente importante).
 As três perguntas de voluntariado (2018, 2022, 2026) são **Sim / Não**, sem
 "prefiro não responder": a opção tende a atrair muita gente e esvaziar a medida.
 
+## Celular: os dois lado a lado
+
+No celular as duas opções **não empilham** — continuam lado a lado, porque
+comparar é a tarefa e empilhar obrigaria a rolar de uma para a outra para
+decidir. Abaixo de 620px a moldura inteira encolhe junto (cabeçalho, balões,
+barra de digitação, contadores), então as duas continuam do mesmo tamanho e na
+mesma escala. A lupa amplia qualquer uma das duas.
+
+Isso também corrige uma assimetria: como `g1` e `no_source` são imagem e
+`post`/`post_source` são desenhados em CSS, sem esse ajuste os primeiros
+encolhiam com a coluna e os segundos mantinham a fonte original — as duas
+fontes ficavam com legibilidade bem diferente no celular.
+
+O bloco fica no **fim** da folha de estilo, de propósito: `@media` não aumenta
+especificidade, então precisa vir depois das regras que sobrescreve.
+
 ## Contadores de reação e encaminhamento
 
 Nos prints originais os contadores estavam gravados na imagem e variavam demais:
