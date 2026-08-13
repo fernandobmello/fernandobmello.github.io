@@ -67,6 +67,20 @@
   .question-block:last-of-type { margin-bottom: 0; }
   .followup { border-left: 3px solid #bfdbfe; padding-left: 15px; margin-top: -10px; }
 
+  /* ── CHECAGEM DE MANIPULAÇÃO ── */
+  /* especificidade maior que .opt.selected, que é declarada depois no arquivo */
+  .options .opt.correct { border-color: var(--success); background: #ecfdf5; }
+  .options .opt.correct span { font-weight: 600; color: #065f46; }
+  .options .opt.wrong { border-color: #dc2626; background: #fef2f2; }
+  .options .opt.wrong span { font-weight: 600; color: #b91c1c; }
+  .options .opt input:disabled + span { opacity: .55; }
+  .options .opt.correct input:disabled + span { opacity: 1; }
+  .mc-feedback { display: none; margin-top: 16px; padding: 14px 16px; border-radius: 10px;
+                 font-size: 0.9rem; line-height: 1.5; border: 1px solid; }
+  .mc-feedback.ok  { display: block; background: #ecfdf5; border-color: #a7f3d0; color: #065f46; }
+  .mc-feedback.err { display: block; background: #fef2f2; border-color: #fecaca; color: #b91c1c; }
+  .mc-feedback strong { display: block; margin-bottom: 3px; font-size: 0.98rem; }
+
   /* ── BATERIAS ITEM A ITEM (uma linha por afirmação) ── */
   .matrix-item { padding-top: 14px; margin-top: 14px; border-top: 1px solid var(--border); }
   .matrix-item:first-child { padding-top: 0; margin-top: 0; border-top: none; }
@@ -613,10 +627,10 @@
     </div>
   </div>
 
-  <!-- ══════════ SCREENS 4–15 — CONJOINTS (gerados dinamicamente) ══════════ -->
+  <!-- ══════════ SCREENS 4–17 — CONJOINTS (gerados dinamicamente) ══════════ -->
 
-  <!-- ══════════ SCREEN 16 — DEMOGRAFIA 1 ══════════ -->
-  <div class="screen" id="screen-16">
+  <!-- ══════════ SCREEN 18 — DEMOGRAFIA 1 ══════════ -->
+  <div class="screen" id="screen-18">
     <div class="card">
       <div class="question-block">
         <div class="question-text">Qual é o seu gênero?</div>
@@ -659,8 +673,8 @@
     </div>
   </div>
 
-  <!-- ══════════ SCREEN 17 — DEMOGRAFIA 2 ══════════ -->
-  <div class="screen" id="screen-17">
+  <!-- ══════════ SCREEN 19 — DEMOGRAFIA 2 ══════════ -->
+  <div class="screen" id="screen-19">
     <div class="card">
       <div class="question-block">
         <div class="question-text">Qual é a sua cor ou raça?</div>
@@ -705,14 +719,14 @@
 
       <div class="alert" id="alert-demo2">Por favor, responda todas as perguntas desta página.</div>
       <div class="nav-buttons">
-        <button class="btn btn-secondary" onclick="goTo(16)">← Voltar</button>
+        <button class="btn btn-secondary" onclick="goTo(18)">← Voltar</button>
         <button class="btn btn-primary btn-lg" onclick="validateDemo2()">Enviar respostas →</button>
       </div>
     </div>
   </div>
 
-  <!-- ══════════ SCREEN 18 — AGRADECIMENTO ══════════ -->
-  <div class="screen" id="screen-18">
+  <!-- ══════════ SCREEN 20 — AGRADECIMENTO ══════════ -->
+  <div class="screen" id="screen-20">
     <div class="card" style="text-align:center;">
       <div class="thanks-icon">🎉</div>
       <div class="thanks-title">Obrigado pela sua participação.</div>
@@ -932,14 +946,29 @@ const BLOCKS = {
   }
 };
 
+// ── CHECAGEM DE MANIPULAÇÃO ──────────────────────────────────────────
+// Vem logo depois da introdução de cada bloco. A ordem das alternativas é
+// sorteada e o respondente só avança quando acerta.
+const MC_QUESTION = 'Antes de começar a selecionar quais conteúdos você compartilharia, em que tipo de grupo você estará compartilhando esses conteúdos?';
+const MC_OPTIONS = [
+  { key: 'bolsonaristas', label: 'Grupo de eleitores bolsonaristas e antipetistas' },
+  { key: 'diversos',      label: 'Grupo com eleitores de diferentes candidatos, incluindo indecisos' },
+  { key: 'vizinhos',      label: 'Grupo de vizinhos' },
+  { key: 'familia',       label: 'Grupo da família' },
+  { key: 'esportes',      label: 'Grupo sobre esportes' }
+];
+const MC_CORRECT = { A: 'bolsonaristas', B: 'diversos' };
+const MC_LABEL = Object.fromEntries(MC_OPTIONS.map(o => [o.key, o.label]));
+
 const TASK_PROMPT = 'Quais das duas mensagens abaixo você prefere compartilhar no grupo?';
 const TASK_PROMPT_SUB = 'Escolha uma obrigatoriamente.';
 
 // ── LAYOUT DE TELAS ──────────────────────────────────────────────────
-// 0 consentimento · 1–3 pré-tratamento · 4–15 conjoints (gerados) · 16–17 demografia · 18 fim
-const CONJ_ANCHOR   = 16;   // as telas geradas são inseridas ANTES desta
+// 0 consentimento · 1–3 pré-tratamento · 4–17 conjoints (gerados) · 18–19 demografia · 20 fim
+// Cada bloco gera 7 telas: introdução, checagem de manipulação e 5 tarefas.
+const CONJ_ANCHOR   = 18;   // as telas geradas são inseridas ANTES desta
 const CONJ_START    = 4;
-const TOTAL_SCREENS = 19;
+const TOTAL_SCREENS = 21;
 const NO_CONSENT_SCREEN = 99;
 
 // Partidos: a ordem é sorteada por respondente. "Outro" fica sempre por último.
@@ -962,6 +991,7 @@ let currentScreen = 0;
 const responses = {};
 let BLOCK_ORDER = null;   // ex.: ['B','A']
 let BLOCK_CONTEXT = null; // mensagens acima do card, por bloco
+let MC_STATE = null;      // checagem de manipulação, por bloco
 let TASKS = null;         // 10 tarefas, na ordem em que são exibidas
 let screenEnterTs = null;
 let submitted = false;
@@ -1068,6 +1098,11 @@ function contextFor(blockKey, profile) {
 function buildAllTasks() {
   BLOCK_ORDER = shuffle(['A','B']);
   BLOCK_CONTEXT = { A: buildBlockContext('A'), B: buildBlockContext('B') };
+  // ordem das alternativas sorteada por bloco
+  MC_STATE = {
+    A: { order: shuffle(MC_OPTIONS), attempts: 0, first: null, done: false },
+    B: { order: shuffle(MC_OPTIONS), attempts: 0, first: null, done: false }
+  };
   TASKS = [];
   BLOCK_ORDER.forEach(bk => { buildBlockTasks(bk).forEach(t => TASKS.push(t)); });
   TASKS.forEach((t, i) => { t.task_global = i+1; });
@@ -1196,6 +1231,28 @@ function generateConjointScreens() {
     INTRO_SCREENS.add(introNum);
     n++;
 
+    // ── checagem de manipulação ──
+    const mc = document.createElement('div');
+    mc.className = 'screen';
+    mc.id = 'screen-' + n;
+    const mcNum = n;
+    mc.innerHTML = `
+      <div class="card">
+        <div class="question-text">${MC_QUESTION}</div>
+        <div class="options" id="mc-opts-${bk}">
+          ${MC_STATE[bk].order.map(o => `
+          <label class="opt"><input type="radio" name="mc_${bk}" value="${o.key}"
+                 onchange="checkMC('${bk}', '${o.key}', this)"><span>${o.label}</span></label>`).join('')}
+        </div>
+        <div class="mc-feedback" id="mc-fb-${bk}"></div>
+        <div class="nav-buttons">
+          <button class="btn btn-secondary" onclick="goTo(${introNum})">← Ver o grupo de novo</button>
+          <button class="btn btn-primary" id="mc-next-${bk}" onclick="goTo(${mcNum+1})" disabled>Próximo →</button>
+        </div>
+      </div>`;
+    container.insertBefore(mc, anchor);
+    n++;
+
     // ── 5 telas de tarefa ──
     for (let i = 0; i < TASKS_PER_BLOCK; i++) {
       const gIdx = bi * TASKS_PER_BLOCK + i;      // índice em TASKS
@@ -1286,6 +1343,33 @@ function preloadImages() {
 // ═══════════════════════════════════════════════════════════════════
 //  INTERAÇÃO
 // ═══════════════════════════════════════════════════════════════════
+// Checagem de manipulação: o respondente só avança quando acerta o tipo de
+// grupo. Erros não bloqueiam a resposta — ficam marcados até ele acertar.
+function checkMC(bk, key, input) {
+  const st = MC_STATE[bk];
+  if (st.done) return;
+  st.attempts++;
+  if (st.first === null) st.first = key;
+
+  const ok = key === MC_CORRECT[bk];
+  const cont = document.getElementById('mc-opts-' + bk);
+  cont.querySelectorAll('.opt').forEach(o => o.classList.remove('correct', 'wrong'));
+  input.closest('.opt').classList.add(ok ? 'correct' : 'wrong');
+
+  const fb = document.getElementById('mc-fb-' + bk);
+  if (ok) {
+    st.done = true;
+    fb.className = 'mc-feedback ok';
+    fb.innerHTML = `<strong>Correto!</strong> Você vai compartilhar no ${MC_LABEL[MC_CORRECT[bk]]}`;
+    document.getElementById('mc-next-' + bk).disabled = false;
+    // trava a resposta certa
+    cont.querySelectorAll('input').forEach(i => { i.disabled = !i.checked; });
+  } else {
+    fb.className = 'mc-feedback err';
+    fb.innerHTML = `<strong>Incorreto!</strong> Tente novamente`;
+  }
+}
+
 function selectProfile(idx, side) {
   ['left','right'].forEach(s => document.getElementById(`cj-${idx}-${s}`)?.classList.remove('selected'));
   document.getElementById(`cj-${idx}-${side}`)?.classList.add('selected');
@@ -1372,8 +1456,8 @@ function goTo(n) {
 function sectionLabel(n) {
   if (n === 0) return 'Seção 1 de 5';
   if (n <= 3) return 'Seção 2 de 5';
-  if (n <= 9) return 'Seção 3 de 5';
-  if (n <= 15) return 'Seção 4 de 5';
+  if (n <= 10) return 'Seção 3 de 5';
+  if (n <= 17) return 'Seção 4 de 5';
   return 'Seção 5 de 5';
 }
 
@@ -1510,7 +1594,7 @@ function validateDemo1() {
   alertEl.classList.remove('show');
   names.forEach(n => { responses[n] = radioVal(n); });
   responses.idade = idade;
-  goTo(17);
+  goTo(19);
 }
 
 function validateDemo2() {
@@ -1528,7 +1612,7 @@ function validateDemo2() {
   alertEl.classList.remove('show');
   names.forEach(n => { responses[n] = radioVal(n); });
   responses.estado = estado;
-  goTo(18);
+  goTo(20);
   submitResponses();
 }
 
@@ -1542,6 +1626,15 @@ function buildPayload() {
   responses.user_agent     = navigator.userAgent;
   responses.screen_w       = window.screen ? window.screen.width : null;
   responses.block_order    = BLOCK_ORDER ? BLOCK_ORDER.join('') : null;
+  if (MC_STATE) {
+    ['A','B'].forEach(bk => {
+      const st = MC_STATE[bk];
+      responses['mc_' + bk + '_first']     = st.first;                     // 1ª alternativa marcada
+      responses['mc_' + bk + '_attempts']  = st.attempts;                  // tentativas até acertar
+      responses['mc_' + bk + '_correct1st'] = st.first === MC_CORRECT[bk] ? 1 : 0;
+      responses['mc_' + bk + '_order']     = st.order.map(o => o.key).join('|');
+    });
+  }
   if (BLOCK_CONTEXT) {
     // Bloco A: as mensagens são fixas e a ORDEM varia por card — a ordem de cada
     // card fica em left_ctx/right_ctx na aba conjoint_long.
@@ -1639,7 +1732,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
 
   window.addEventListener('beforeunload', e => {
-    if (currentScreen > 0 && currentScreen < 18) { e.preventDefault(); e.returnValue = ''; }
+    if (currentScreen > 0 && currentScreen < 20) { e.preventDefault(); e.returnValue = ''; }
   });
 
   updateProgress();

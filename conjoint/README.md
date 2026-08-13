@@ -178,6 +178,29 @@ nos casos `unclear`, em que ela é aleatória.
 repetidas nas 5 tarefas, gravadas em `context_B`. Pool e quantidade (`CTX_COUNT`)
 ficam em `BLOCKS`, no `index.html`.
 
+### Checagem de manipulação
+
+Logo depois da introdução de cada bloco, antes das tarefas, o respondente
+precisa dizer em que tipo de grupo vai compartilhar. A ordem das cinco
+alternativas é sorteada **por bloco** (independentemente uma da outra), e o
+botão "Próximo" só libera quando ele acerta:
+
+| Bloco | Resposta certa |
+|---|---|
+| A | Grupo de eleitores bolsonaristas e antipetistas |
+| B | Grupo com eleitores de diferentes candidatos, incluindo indecisos |
+
+Acerto mostra em verde *"Correto! Você vai compartilhar no …"* e trava a
+resposta. Erro mostra em vermelho *"Incorreto! Tente novamente"* e mantém o
+avanço bloqueado — o respondente pode tentar quantas vezes quiser, e há um
+botão "← Ver o grupo de novo" que volta para a conversa.
+
+Gravado por bloco: `mc_A_first` / `mc_B_first` (primeira alternativa marcada),
+`mc_A_attempts` / `mc_B_attempts` (tentativas até acertar), `mc_A_correct1st` /
+`mc_B_correct1st` (1 se acertou de primeira) e `mc_A_order` / `mc_B_order` (a
+ordem exibida). Como todo mundo acaba acertando, o que mede atenção é o
+`correct1st` e o número de tentativas — não a resposta final.
+
 ### ⚠️ A classificação de valência é um julgamento — confira
 
 `valence` está em `STORIES`, no `index.html`, e foi atribuída por leitura da
@@ -337,13 +360,13 @@ console do navegador quando o `ENDPOINT` ainda não foi configurado (modo de tes
 | 1 | Interesse por política (1–7) · importância de influenciar (1–7) · frequência de compartilhamento (7 pontos) |
 | 2 | Partidos (+ 2 perguntas condicionais) · termômetros · bolsonarista vs. antipetista |
 | 3 | Consumo de notícias · plataformas · busca por política · exposição a conflito (7 pontos) · evitação · voluntariado em 2018/2022/2026 |
-| 4–9 | Primeiro bloco: introdução + 5 tarefas |
-| 10–15 | Segundo bloco: introdução + 5 tarefas |
-| 16 | Gênero · idade · escolaridade · renda |
-| 17 | Cor/raça · estado · religiosidade · perda de status |
-| 18 | Agradecimento + envio |
+| 4–10 | Primeiro bloco: introdução + checagem + 5 tarefas |
+| 11–17 | Segundo bloco: introdução + checagem + 5 tarefas |
+| 18 | Gênero · idade · escolaridade · renda |
+| 19 | Cor/raça · estado · religiosidade · perda de status |
+| 20 | Agradecimento + envio |
 
-As telas 4–15 são geradas por JavaScript no momento do consentimento, já na ordem
+As telas 4–17 são geradas por JavaScript no momento do consentimento, já na ordem
 sorteada. Todas as perguntas são obrigatórias e validadas antes de avançar; não há
 botão de voltar de dentro do conjoint para as telas anteriores.
 

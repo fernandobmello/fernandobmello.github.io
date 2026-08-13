@@ -34,6 +34,9 @@ var RESP_COLS = [
   'genero','idade','escolaridade','renda',
   'raca','estado','religiao','status',
   'context_A','context_B',
+  'mc_A_first','mc_A_attempts','mc_A_correct1st',
+  'mc_B_first','mc_B_attempts','mc_B_correct1st',
+  'mc_A_order','mc_B_order',
   'partido_gosta_order','partido_menos_order','user_agent','screen_w'
 ];
 
