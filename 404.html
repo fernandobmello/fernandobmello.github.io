@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Página não encontrada</title>
+<script>
+  // Teachers often type /certificado, /Certificados, or paste the link with
+  // trailing punctuation; send any such address to the certificates page.
+  if (/certificad/i.test(decodeURIComponent(location.pathname + location.search + location.hash))) {
+    location.replace("/certificados/");
+  }
+</script>
+<style>
+  :root { --bg: #ffffff; --fg: #14285a; --muted: #5a6478; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #11151f; --fg: #e6ebf5; --muted: #9aa3b5; } }
+  body { margin: 0; padding: 48px 16px; background: var(--bg); color: var(--fg);
+         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; text-align: center; }
+  p { color: var(--muted); }
+  a { color: inherit; }
+</style>
+</head>
+<body>
+  <h1>Página não encontrada</h1>
+  <p>Procurando os certificados dos alunos? Acesse <a href="/certificados/">fernandobmello.com/certificados</a>.</p>
+  <p><a href="/">Voltar para a página inicial</a></p>
+</body>
+</html>
